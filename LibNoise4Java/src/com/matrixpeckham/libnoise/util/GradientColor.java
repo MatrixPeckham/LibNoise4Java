@@ -7,50 +7,21 @@
  */
 package com.matrixpeckham.libnoise.util;
 
+import static com.matrixpeckham.libnoise.util.Globals.clampValue;
+import static com.matrixpeckham.libnoise.util.Globals.linearInterpColor;
 import java.util.ArrayList;
 
-/**
- * Defines a color gradient. A color gradient is a list of gradually-changing
- * colors. A color gradient is defined by a list of
- * <i>gradient points</i>. Each gradient point has a position and a color. In a
- * color gradient, the colors between two adjacent gradient points are linearly
- * interpolated. To add a gradient point to the color gradient, pass its
- * position and color to the AddGradientPoint() method. To retrieve a color from
- * a specific position in the color gradient, pass that position to the
- * GetColor() method. This class is a useful tool for coloring height maps based
- * on elevation. <b>Gradient example</b>
- * Suppose a gradient object contains the following gradient points: - -1.0 maps
- * to black. - 0.0 maps to white. - 1.0 maps to red. If an application passes
- * -0.5 to the GetColor() method, this method will return a gray color that is
- * halfway between black and white. If an application passes 0.25 to the
- * GetColor() method, this method will return a very light pink color that is
- * one quarter of the way between white and red.
- *
- * @author William Matrix Peckham
- */
+
 public class GradientColor {
 
     /**
-     * Defines a point used to build a color gradient. A color gradient is a
-     * list of gradually-changing colors. A color gradient is defined by a list
-     * of <i>gradient points</i>. Each gradient point has a position and a
-     * color. In a color gradient, the colors between two adjacent gradient
-     * points are linearly interpolated. The ColorGradient class defines a color
-     * gradient by a list of these objects.
+     * Array that stores the gradient points.
      */
-    public static class GradientPoint {
+    ArrayList<GradientPoint> gradientPoints;
 
-        /**
-         * The position of this gradient point.
-         */
-        public double pos;
-
-        /**
-         * The color of this gradient point.
-         */
-        public Color color;
-
-    };
+    /* A color object that is used by a gradient object to store a
+    temporary value.*/
+    Color workingColor = new Color();
 
     public GradientColor() {
         gradientPoints = new ArrayList<>();
@@ -82,76 +53,6 @@ public class GradientColor {
      */
     public void clear() {
         gradientPoints.clear();
-    }
-
-    /**
-     * Returns the color at the specified position in the color gradient.
-     *
-     * @param gradientPos The specified position.
-     *
-     * @returns The color at that position.
-     */
-    public Color getColor(double gradientPos) {
-
-        // Find the first element in the gradient point array that has a gradient
-        // position larger than the gradient position passed to this method.
-        int indexPos;
-        for (indexPos = 0; indexPos < gradientPoints.size(); indexPos++) {
-            if (gradientPos < gradientPoints.get(indexPos).pos) {
-                break;
-            }
-        }
-
-        // Find the two nearest gradient points so that we can perform linear
-        // interpolation on the color.
-        int index0 = Globals.clampValue(indexPos - 1, 0, gradientPoints.size()
-                - 1);
-        int index1 = Globals.clampValue(indexPos, 0, gradientPoints.size() - 1);
-
-        // If some gradient points are missing (which occurs if the gradient
-        // position passed to this method is greater than the largest gradient
-        // position or less than the smallest gradient position in the array), get
-        // the corresponding gradient color of the nearest gradient point and exit
-        // now.
-        if (index0 == index1) {
-            workingColor.setTo(gradientPoints.get(index1).color);
-            return new Color(workingColor);
-        }
-
-        // Compute the alpha value used for linear interpolation.
-        double input0 = gradientPoints.get(index0).pos;
-        double input1 = gradientPoints.get(index1).pos;
-        double alpha = (gradientPos - input0) / (input1 - input0);
-        // Now perform the linear interpolation given the alpha value.
-        Color color0 = gradientPoints.get(index0).color;
-        Color color1 = gradientPoints.get(index1).color;
-        Globals.linearInterpColor(color0, color1, alpha, workingColor);
-        return new Color(workingColor);
-    }
-
-    /**
-     * Returns a pointer to the array of gradient points in this object.
-     *
-     * @returns A pointer to the array of gradient points.
-     *
-     * Before calling this method, call GetGradientPointCount() to determine the
-     * number of gradient points in this array.
-     *
-     * It is recommended that an application does not store this pointer for
-     * later use since the pointer to the array may change if the application
-     * calls another method of this object.
-     */
-    public ArrayList<GradientPoint> getGradientPointArray() {
-        return gradientPoints;
-    }
-
-    /**
-     * Returns the number of gradient points stored in this object.
-     *
-     * @returns The number of gradient points stored in this object.
-     */
-    public int getGradientPointCount() {
-        return gradientPoints.size();
     }
 
     /**
@@ -189,6 +90,73 @@ public class GradientColor {
     }
 
     /**
+     * Returns the color at the specified position in the color gradient.
+     *
+     * @param gradientPos The specified position.
+     *
+     * @returns The color at that position.
+     */
+    public Color getColor(double gradientPos) {
+        // Find the first element in the gradient point array that has a gradient
+        // position larger than the gradient position passed to this method.
+        int indexPos;
+        for (indexPos = 0; indexPos < gradientPoints.size(); indexPos++) {
+            if (gradientPos < gradientPoints.get(indexPos).pos) {
+                break;
+            }
+        }
+        // Find the two nearest gradient points so that we can perform linear
+        // interpolation on the color.
+        int index0
+                = clampValue(indexPos - 1, 0, gradientPoints.size()
+                        - 1);
+        int index1 = clampValue(indexPos, 0, gradientPoints.size() - 1);
+        // If some gradient points are missing (which occurs if the gradient
+        // position passed to this method is greater than the largest gradient
+        // position or less than the smallest gradient position in the array), get
+        // the corresponding gradient color of the nearest gradient point and exit
+        // now.
+        if (index0 == index1) {
+            workingColor.setTo(gradientPoints.get(index1).color);
+            return new Color(workingColor);
+        }
+        // Compute the alpha value used for linear interpolation.
+        double input0 = gradientPoints.get(index0).pos;
+        double input1 = gradientPoints.get(index1).pos;
+        double alpha = (gradientPos - input0) / (input1 - input0);
+        // Now perform the linear interpolation given the alpha value.
+        Color color0 = gradientPoints.get(index0).color;
+        Color color1 = gradientPoints.get(index1).color;
+        linearInterpColor(color0, color1, alpha, workingColor);
+        return new Color(workingColor);
+    }
+
+    /**
+     * Returns a pointer to the array of gradient points in this object.
+     *
+     * @returns A pointer to the array of gradient points.
+     *
+     * Before calling this method, call GetGradientPointCount() to determine the
+     * number of gradient points in this array.
+     *
+     * It is recommended that an application does not store this pointer for
+     * later use since the pointer to the array may change if the application
+     * calls another method of this object.
+     */
+    public ArrayList<GradientPoint> getGradientPointArray() {
+        return gradientPoints;
+    }
+
+    /**
+     * Returns the number of gradient points stored in this object.
+     *
+     * @returns The number of gradient points stored in this object.
+     */
+    public int getGradientPointCount() {
+        return gradientPoints.size();
+    }
+
+    /**
      * Inserts the gradient point at the specified position in the internal
      * gradient-point array.
      *
@@ -214,12 +182,25 @@ public class GradientColor {
     }
 
     /**
-     * Array that stores the gradient points.
+     * Defines a point used to build a color gradient. A color gradient is a
+     * list of gradually-changing colors. A color gradient is defined by a list
+     * of <i>gradient points</i>. Each gradient point has a position and a
+     * color. In a color gradient, the colors between two adjacent gradient
+     * points are linearly interpolated. The ColorGradient class defines a color
+     * gradient by a list of these objects.
      */
-    ArrayList<GradientPoint> gradientPoints;
+    public static class GradientPoint {
 
-    /* A color object that is used by a gradient object to store a
-     temporary value.*/
-    Color workingColor = new Color();
+        /**
+         * The position of this gradient point.
+         */
+        public double pos;
+
+        /**
+         * The color of this gradient point.
+         */
+        public Color color;
+
+    }
 
 }

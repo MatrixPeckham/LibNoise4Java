@@ -7,27 +7,7 @@
  */
 package com.matrixpeckham.libnoise.module;
 
-/**
- * Noise module that clamps the output value from a source module to a range of
- * values.
- *
- * <img src="moduleclamp.png" alt="MODULE_CLAMP_IMAGE" />
- *
- * The range of values in which to clamp the output value is called the
- * <i>clamping range</i>.
- *
- * If the output value from the source module is less than the lower bound of
- * the clamping range, this noise module clamps that value to the lower bound.
- * If the output value from the source module is greater than the upper bound of
- * the clamping range, this noise module clamps that value to the upper bound.
- *
- * To specify the upper and lower bounds of the clamping range, call the
- * SetBounds() method.
- *
- * This noise module requires one source module.
- *
- * @author William Matrix Peckham
- */
+
 public class Clamp extends Module {
 
     /**
@@ -65,6 +45,49 @@ public class Clamp extends Module {
     }
 
     /**
+     * Returns the lower bound of the clamping range.
+     *
+     * @returns The lower bound.
+     *
+     * If the output value from the source module is less than the lower bound
+     * of the clamping range, this noise module clamps that value to the lower
+     * bound.
+     */
+    public double getLowerBound() {
+        return lowerBound;
+    }
+
+    @Override
+    public int getSourceModuleCount() {
+        return 1;
+    }
+
+    /**
+     * Returns the upper bound of the clamping range.
+     *
+     * @returns The upper bound.
+     *
+     * If the output value from the source module is greater than the upper
+     * bound of the clamping range, this noise module clamps that value to the
+     * upper bound.
+     */
+    public double getUpperBound() {
+        return upperBound;
+    }
+
+    @Override
+    public double getValue(double x, double y, double z) {
+        double value = sourceModule[0].getValue(x, y, z);
+        if (value < lowerBound) {
+            return lowerBound;
+        } else if (value > upperBound) {
+            return upperBound;
+        } else {
+            return value;
+        }
+    }
+
+    /**
      * Sets the lower and upper bounds of the clamping range.
      *
      * @param lower The lower bound.
@@ -84,49 +107,6 @@ public class Clamp extends Module {
     public void setBounds(double lower, double upper) {
         lowerBound = lower;
         upperBound = upper;
-    }
-
-    /**
-     * Returns the lower bound of the clamping range.
-     *
-     * @returns The lower bound.
-     *
-     * If the output value from the source module is less than the lower bound
-     * of the clamping range, this noise module clamps that value to the lower
-     * bound.
-     */
-    public double getLowerBound() {
-        return lowerBound;
-    }
-
-    /**
-     * Returns the upper bound of the clamping range.
-     *
-     * @returns The upper bound.
-     *
-     * If the output value from the source module is greater than the upper
-     * bound of the clamping range, this noise module clamps that value to the
-     * upper bound.
-     */
-    public double getUpperBound() {
-        return upperBound;
-    }
-
-    @Override
-    public int getSourceModuleCount() {
-        return 1;
-    }
-
-    @Override
-    public double getValue(double x, double y, double z) {
-        double value = sourceModule[0].getValue(x, y, z);
-        if (value < lowerBound) {
-            return lowerBound;
-        } else if (value > upperBound) {
-            return upperBound;
-        } else {
-            return value;
-        }
     }
 
 }

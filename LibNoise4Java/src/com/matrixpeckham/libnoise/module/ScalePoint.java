@@ -7,24 +7,7 @@
  */
 package com.matrixpeckham.libnoise.module;
 
-/**
- * Noise module that scales the coordinates of the input value before returning
- * the output value from a source module.
- *
- * <img src="modulescalepoint.png" alt="MODULE_SCALEPOINT_IMAGE" />
- *
- *
- * The GetValue() method multiplies the ( @a x, @a y, @a z ) coordinates of the
- * input value with a scaling factor before returning the output value from the
- * source module. To set the scaling factor, call the SetScale() method. To set
- * the scaling factor to apply to the individual @a x, @a y, or @a z
- * coordinates, call the SetXScale(), SetYScale() or SetZScale() methods,
- * respectively.
- *
- * This noise module requires one source module.
- *
- * @author William Matrix Peckham
- */
+
 public class ScalePoint extends Module {
 
     /**
@@ -64,6 +47,18 @@ public class ScalePoint extends Module {
         return sourceModule[0].getValue(x * xScale, y * yScale, z * zScale);
     }
 
+    public double getxScale() {
+        return xScale;
+    }
+
+    public double getyScale() {
+        return yScale;
+    }
+
+    public double getzScale() {
+        return zScale;
+    }
+
     public void setScale(double scale) {
         xScale = yScale = zScale = scale;
     }
@@ -74,24 +69,12 @@ public class ScalePoint extends Module {
         zScale = z;
     }
 
-    public double getxScale() {
-        return xScale;
-    }
-
     public void setxScale(double xScale) {
         this.xScale = xScale;
     }
 
-    public double getyScale() {
-        return yScale;
-    }
-
     public void setyScale(double yScale) {
         this.yScale = yScale;
-    }
-
-    public double getzScale() {
-        return zScale;
     }
 
     public void setzScale(double zScale) {

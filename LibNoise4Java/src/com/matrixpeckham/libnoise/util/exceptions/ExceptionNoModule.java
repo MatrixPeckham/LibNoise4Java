@@ -7,6 +7,9 @@
  */
 package com.matrixpeckham.libnoise.util.exceptions;
 
+import java.util.logging.Logger;
+import static java.util.logging.Logger.getLogger;
+
 /**
  * No module exception
  *
@@ -19,6 +22,11 @@ package com.matrixpeckham.libnoise.util.exceptions;
  * @author William Matrix Peckham
  */
 public class ExceptionNoModule extends NoiseException {
+
+    private static final Logger LOG = getLogger(ExceptionNoModule.class.
+            getName());
+
+    private static final long serialVersionUID = 1L;
 
     public ExceptionNoModule() {
     }

@@ -7,42 +7,11 @@
  */
 package com.matrixpeckham.libnoise.module;
 
-import com.matrixpeckham.libnoise.util.Globals;
+import static com.matrixpeckham.libnoise.util.Globals.clampValue;
+import static com.matrixpeckham.libnoise.util.Globals.linearInterp;
 import java.util.ArrayList;
 
-/**
- * Noise module that maps the output value from a source module onto a
- * terrace-forming curve.
- *
- * <img src="moduleterrace.png" alt="MODULE_TERRACE_IMAGE" />
- *
- * This noise module maps the output value from the source module onto a
- * terrace-forming curve. The start of this curve has a slope of zero; its slope
- * then smoothly increases. This curve also contains
- * <i>control points</i> which resets the slope to zero at that point, producing
- * a "terracing" effect. Refer to the following illustration:
- *
- * <img src="terrace.png" alt="TERRACE_IMAGE" />
- *
- * To add a control point to this noise module, call the AddControlPoint()
- * method.
- *
- * An application must add a minimum of two control points to the curve. If this
- * is not done, the GetValue() method fails. The control points can have any
- * value, although no two control points can have the same value. There is no
- * limit to the number of control points that can be added to the curve.
- *
- * This noise module clamps the output value from the source module if that
- * value is less than the value of the lowest control point or greater than the
- * value of the highest control point.
- *
- * This noise module is often used to generate terrain features such as your
- * stereotypical desert canyon.
- *
- * This noise module requires one source module.
- *
- * @author William Matrix Peckham
- */
+
 public class Terrace extends Module {
 
     /**
@@ -98,6 +67,42 @@ public class Terrace extends Module {
     }
 
     /**
+     * Determines the array index in which to insert the control point into the
+     * internal control point array.
+     *
+     * @param value The value of the control point.
+     *
+     * @returns The array index in which to insert the control point.
+     *
+     * @pre No two control points have the same value.
+     *
+     * @throw noise::ExceptionInvalidParam An invalid parameter was specified;
+     * see the preconditions for more information.
+     *
+     * By inserting the control point at the returned array index, this class
+     * ensures that the control point array is sorted by value. The code that
+     * maps a value onto the curve requires a sorted control point array.
+     */
+    protected int findInsertionPos(double value) {
+        int insertionPos;
+        
+        for (insertionPos = 0; insertionPos < controlPoints.size();
+                insertionPos++) {
+            if (value < controlPoints.get(insertionPos)) {
+                //we found the array index in which to insert the new control point
+                break;
+            } else if (value == controlPoints.get(insertionPos)) {
+                //each control point is required to contain a unique value, so
+                //throw an exception
+                throw new IllegalArgumentException(
+                        "Control points must be unique");
+            }
+        }
+        
+        return insertionPos;
+    }
+
+    /**
      * Returns a pointer to the array of control points on the terrace-forming
      * curve.
      *
@@ -130,6 +135,68 @@ public class Terrace extends Module {
     @Override
     public int getSourceModuleCount() {
         return 1;
+    }
+
+    @Override
+    public double getValue(double x, double y, double z) {
+        //get the output value from the source module
+        double sourceModuleValue = sourceModule[0].getValue(x, y, z);
+        //find the first element in the control point array that has a value
+        //larger than the output value fromt he source module
+        int indexPos;
+        for (indexPos = 0; indexPos < controlPoints.size(); indexPos++) {
+            if (sourceModuleValue < controlPoints.get(indexPos)) {
+                break;
+            }
+        }
+        //find the two nearest control points so that we can map their values
+        //onto a quadratic cure
+        int index0
+                = clampValue(indexPos - 1, 0, controlPoints.size()
+                        - 1);
+        int index1 = clampValue(indexPos, 0, controlPoints.size() - 1);
+        //if some control points are missin (which occurs if the output value of
+        //the source module is greater than the larger value or less than the
+        //smallest value of the control point array, get the value of the
+        //nearest control point and exit
+        if (index0 == index1) {
+            return controlPoints.get(index1);
+        }
+        //compute the alpha value used for linear interpolation
+        double value0 = controlPoints.get(index0);
+        double value1 = controlPoints.get(index1);
+        double alpha = (sourceModuleValue - value0) / (value1 - value0);
+        if (invertTerraces) {
+            alpha = 1.0 - alpha;
+            double t = value0;
+            value0 = value1;
+            value1 = t;
+        }
+        //squareing the alpha produces the terrace effect.
+        alpha *= alpha;
+        //now linear interpolate
+        return linearInterp(value0, value1, alpha);
+    }
+
+    /**
+     * Inserts the control point at the specified position in the internal
+     * control point array.
+     *
+     * @param insertionPos The zero-based array position in which to insert the
+     * control point.
+     * @param value The value of the control point.
+     *
+     * To make room for this new control point, this method reallocates the
+     * control point array and shifts all control points occurring after the
+     * insertion position up by one.
+     *
+     * Because the curve mapping algorithm in this noise module requires that
+     * all control points in the array be sorted by value, the new control point
+     * should be inserted at the position in which the order is still preserved.
+     */
+    protected void insertAtPos(int insertionPos, double value) {
+        //we don't need bookkeeping
+        controlPoints.add(insertionPos, value);
     }
 
     /**
@@ -191,110 +258,6 @@ public class Terrace extends Module {
             addControlPoint(curValue);
             curValue += terraceStep;
         }
-    }
-
-    /**
-     * Determines the array index in which to insert the control point into the
-     * internal control point array.
-     *
-     * @param value The value of the control point.
-     *
-     * @returns The array index in which to insert the control point.
-     *
-     * @pre No two control points have the same value.
-     *
-     * @throw noise::ExceptionInvalidParam An invalid parameter was specified;
-     * see the preconditions for more information.
-     *
-     * By inserting the control point at the returned array index, this class
-     * ensures that the control point array is sorted by value. The code that
-     * maps a value onto the curve requires a sorted control point array.
-     */
-    protected int findInsertionPos(double value) {
-        int insertionPos;
-
-        for (insertionPos = 0; insertionPos < controlPoints.size();
-                insertionPos++) {
-            if (value < controlPoints.get(insertionPos)) {
-                //we found the array index in which to insert the new control point
-                break;
-            } else if (value == controlPoints.get(insertionPos)) {
-                //each control point is required to contain a unique value, so
-                //throw an exception
-                throw new IllegalArgumentException(
-                        "Control points must be unique");
-            }
-        }
-
-        return insertionPos;
-    }
-
-    /**
-     * Inserts the control point at the specified position in the internal
-     * control point array.
-     *
-     * @param insertionPos The zero-based array position in which to insert the
-     * control point.
-     * @param value The value of the control point.
-     *
-     * To make room for this new control point, this method reallocates the
-     * control point array and shifts all control points occurring after the
-     * insertion position up by one.
-     *
-     * Because the curve mapping algorithm in this noise module requires that
-     * all control points in the array be sorted by value, the new control point
-     * should be inserted at the position in which the order is still preserved.
-     */
-    protected void insertAtPos(int insertionPos, double value) {
-        //we don't need bookkeeping
-        controlPoints.add(insertionPos, value);
-    }
-
-    @Override
-    public double getValue(double x, double y, double z) {
-        //get the output value from the source module
-        double sourceModuleValue = sourceModule[0].getValue(x, y, z);
-
-        //find the first element in the control point array that has a value
-        //larger than the output value fromt he source module
-        int indexPos;
-        for (indexPos = 0; indexPos < controlPoints.size(); indexPos++) {
-            if (sourceModuleValue < controlPoints.get(indexPos)) {
-                break;
-            }
-        }
-
-        //find the two nearest control points so that we can map their values
-        //onto a quadratic cure
-        int index0 = Globals.clampValue(indexPos - 1, 0, controlPoints.size()
-                - 1);
-        int index1 = Globals.clampValue(indexPos, 0, controlPoints.size() - 1);
-
-        //if some control points are missin (which occurs if the output value of
-        //the source module is greater than the larger value or less than the
-        //smallest value of the control point array, get the value of the
-        //nearest control point and exit
-        if (index0 == index1) {
-            return controlPoints.get(index1);
-        }
-
-        //compute the alpha value used for linear interpolation
-        double value0 = controlPoints.get(index0);
-        double value1 = controlPoints.get(index1);
-        double alpha = (sourceModuleValue - value0) / (value1 - value0);
-        if (invertTerraces) {
-            alpha = 1.0 - alpha;
-            double t = value0;
-            value0 = value1;
-            value1 = t;
-        }
-
-        //squareing the alpha produces the terrace effect.
-        alpha *= alpha;
-
-        //now linear interpolate
-        return Globals.linearInterp(value0, value1, alpha);
-
     }
 
 }

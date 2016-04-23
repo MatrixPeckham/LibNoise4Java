@@ -9,25 +9,7 @@ package com.matrixpeckham.libnoise.model;
 
 import com.matrixpeckham.libnoise.module.Module;
 
-/**
- * Model that defines the displacement of a line segment.
- *
- * This model returns an output value from a noise module given the
- * one-dimensional coordinate of an input value located on a line segment, which
- * can be used as displacements.
- *
- * This class is useful for creating:
- *
- * - roads and rivers
- *
- * - disaffected college students
- *
- * To generate an output value, pass an input value between 0.0 and 1.0 to the
- * GetValue() method. 0.0 represents the start position of the line segment and
- * 1.0 represents the end position of the line segment.
- *
- * @author William Matrix Peckham
- */
+
 public class Line {
 
     /**
@@ -87,58 +69,6 @@ public class Line {
     }
 
     /**
-     * Sets the position ( @a x, @a y, @a z ) of the start of the line segment
-     * to choose values along.
-     *
-     * @param x x coordinate of the start position.
-     * @param y y coordinate of the start position.
-     * @param z z coordinate of the start position.
-     */
-    public void setStartPoint(double x, double y, double z) {
-        x0 = x;
-        y0 = y;
-        z0 = z;
-    }
-
-    /**
-     * Sets the noise module that is used to generate the output values.
-     *
-     * @param module The noise module that is used to generate the output
-     * values.
-     *
-     * This noise module must exist for the lifetime of this object, until you
-     * pass a new noise module to this method.
-     */
-    public void setModule(Module module) {
-        this.module = module;
-    }
-
-    /**
-     * Sets the position ( @a x, @a y, @a z ) of the end of the line segment to
-     * choose values along.
-     *
-     * @param x x coordinate of the end position.
-     * @param y y coordinate of the end position.
-     * @param z z coordinate of the end position.
-     */
-    public void setEndPoint(double x, double y, double z) {
-        x1 = x;
-        y1 = y;
-        z1 = z;
-    }
-
-    /**
-     * Sets a flag indicating that the output value is to be attenuated (moved
-     * toward 0.0) as the ends of the line segment are approached.
-     *
-     * @param att A flag that specifies whether the output value is to be
-     * attenuated.
-     */
-    public void setAttenuate(boolean att) {
-        this.attenuate = att;
-    }
-
-    /**
      * Returns a flag indicating whether the output value is to be attenuated
      * (moved toward 0.0) as the ends of the line segment are approached by the
      * input value.
@@ -184,6 +114,58 @@ public class Line {
         } else {
             return value;
         }
+    }
+
+    /**
+     * Sets a flag indicating that the output value is to be attenuated (moved
+     * toward 0.0) as the ends of the line segment are approached.
+     *
+     * @param att A flag that specifies whether the output value is to be
+     * attenuated.
+     */
+    public void setAttenuate(boolean att) {
+        this.attenuate = att;
+    }
+
+    /**
+     * Sets the position ( @a x, @a y, @a z ) of the end of the line segment to
+     * choose values along.
+     *
+     * @param x x coordinate of the end position.
+     * @param y y coordinate of the end position.
+     * @param z z coordinate of the end position.
+     */
+    public void setEndPoint(double x, double y, double z) {
+        x1 = x;
+        y1 = y;
+        z1 = z;
+    }
+
+    /**
+     * Sets the noise module that is used to generate the output values.
+     *
+     * @param module The noise module that is used to generate the output
+     * values.
+     *
+     * This noise module must exist for the lifetime of this object, until you
+     * pass a new noise module to this method.
+     */
+    public void setModule(Module module) {
+        this.module = module;
+    }
+
+    /**
+     * Sets the position ( @a x, @a y, @a z ) of the start of the line segment
+     * to choose values along.
+     *
+     * @param x x coordinate of the start position.
+     * @param y y coordinate of the start position.
+     * @param z z coordinate of the start position.
+     */
+    public void setStartPoint(double x, double y, double z) {
+        x0 = x;
+        y0 = y;
+        z0 = z;
     }
 
 }

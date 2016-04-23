@@ -7,6 +7,8 @@
  */
 package com.matrixpeckham.libnoise.module;
 
+import java.util.logging.Logger;
+
 /**
  * Noise module that outputs the product of the two output values from two
  * source modules.
@@ -29,5 +31,7 @@ public class Multiply extends Module {
         return sourceModule[0].getValue(x, y, z) * sourceModule[1].
                 getValue(x, y, z);
     }
+
+    private static final Logger LOG = Logger.getLogger(Multiply.class.getName());
 
 }

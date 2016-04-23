@@ -7,7 +7,10 @@
  */
 package com.matrixpeckham.libnoise.module;
 
-import com.matrixpeckham.libnoise.util.Globals;
+import static com.matrixpeckham.libnoise.util.Globals.getMin;
+import static java.lang.Math.floor;
+import static java.lang.Math.sqrt;
+import java.util.logging.Logger;
 
 /**
  * Noise module that outputs concentric spheres.
@@ -49,6 +52,9 @@ public class Spheres extends Module {
      */
     protected double frequency;
 
+    /**
+     *
+     */
     public Spheres() {
         frequency = DEFAULT_SPHERES_FREQUENCY;
     }
@@ -73,11 +79,11 @@ public class Spheres extends Module {
         y *= frequency;
         z *= frequency;
 
-        double distFromCenter = Math.sqrt(x * x + y * y + z * z);
-        double distFromSmallerSphere = distFromCenter - Math.floor(
+        double distFromCenter = sqrt(x * x + y * y + z * z);
+        double distFromSmallerSphere = distFromCenter - floor(
                 distFromCenter);
         double distFromLargerSphere = 1.0 - distFromSmallerSphere;
-        double nearestDist = Globals.getMin(distFromSmallerSphere,
+        double nearestDist = getMin(distFromSmallerSphere,
                 distFromLargerSphere);
         return 1.0 - (nearestDist * 4.0);//re-normalize to -1-1
     }
@@ -93,5 +99,7 @@ public class Spheres extends Module {
     public void setFrequency(double frequency) {
         this.frequency = frequency;
     }
+
+    private static final Logger LOG = Logger.getLogger(Spheres.class.getName());
 
 }

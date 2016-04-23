@@ -7,6 +7,8 @@
  */
 package com.matrixpeckham.libnoise.util;
 
+import java.util.logging.Logger;
+
 /**
  * Holds an x, y, z triple.
  *
@@ -14,18 +16,38 @@ package com.matrixpeckham.libnoise.util;
  */
 public class Vec3 {
 
+    /**
+     *
+     */
     public double x = 0;
 
+    /**
+     *
+     */
     public double y = 0;
 
+    /**
+     *
+     */
     public double z = 0;
 
+    /**
+     *
+     */
     public Vec3() {
     }
 
+    /**
+     *
+     * @param x
+     * @param y
+     * @param z
+     */
     public Vec3(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
+
+    private static final Logger LOG = Logger.getLogger(Vec3.class.getName());
 }

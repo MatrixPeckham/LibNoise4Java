@@ -7,103 +7,12 @@
  */
 package com.matrixpeckham.libnoise.module;
 
-import com.matrixpeckham.libnoise.util.Globals;
+import static com.matrixpeckham.libnoise.util.Globals.gradientCoherentNoise3D;
+import static com.matrixpeckham.libnoise.util.Globals.makeIntRange;
 import com.matrixpeckham.libnoise.util.NoiseQuality;
+import static com.matrixpeckham.libnoise.util.NoiseQuality.STD;
 
-/**
- * Noise module that outputs 3-dimensional Perlin noise.
- *
- * <img src="moduleperlin.png" alt="MODULE_PERLIN_IMAGE" />
- *
- * Perlin noise is the sum of several coherent-noise functions of
- * ever-increasing frequencies and ever-decreasing amplitudes.
- *
- * An important property of Perlin noise is that a small change in the input
- * value will produce a small change in the output value, while a large change
- * in the input value will produce a random change in the output value.
- *
- * This noise module outputs Perlin-noise values that usually range from -1.0 to
- * +1.0, but there are no guarantees that all output values will exist within
- * that range.
- *
- * For a better description of Perlin noise, see the links in the
- * <i>References and Acknowledgments</i> section.
- *
- * This noise module does not require any source modules.
- *
- * <b>Octaves</b>
- *
- * The number of octaves control the <i>amount of detail</i> of the Perlin
- * noise. Adding more octaves increases the detail of the Perlin noise, but with
- * the drawback of increasing the calculation time.
- *
- * An octave is one of the coherent-noise functions in a series of
- * coherent-noise functions that are added together to form Perlin noise.
- *
- * An application may specify the frequency of the first octave by calling the
- * SetFrequency() method.
- *
- * An application may specify the number of octaves that generate Perlin noise
- * by calling the SetOctaveCount() method.
- *
- * These coherent-noise functions are called octaves because each octave has, by
- * default, double the frequency of the previous octave. Musical tones have this
- * property as well; a musical C tone that is one octave higher than the
- * previous C tone has double its frequency.
- *
- * <b>Frequency</b>
- *
- * An application may specify the frequency of the first octave by calling the
- * SetFrequency() method.
- *
- * <b>Persistence</b>
- *
- * The persistence value controls the <i>roughness</i> of the Perlin noise.
- * Larger values produce rougher noise.
- *
- * The persistence value determines how quickly the amplitudes diminish for
- * successive octaves. The amplitude of the first octave is 1.0. The amplitude
- * of each subsequent octave is equal to the product of the previous octave's
- * amplitude and the persistence value. So a persistence value of 0.5 sets the
- * amplitude of the first octave to 1.0; the second, 0.5; the third, 0.25; etc.
- *
- * An application may specify the persistence value by calling the
- * SetPersistence() method.
- *
- * <b>Lacunarity</b>
- *
- * The lacunarity specifies the frequency multipler between successive octaves.
- *
- * The effect of modifying the lacunarity is subtle; you may need to play with
- * the lacunarity value to determine the effects. For best results, set the
- * lacunarity to a number between 1.5 and 3.5.
- *
- * <b>References &amp; acknowledgments</b>
- *
- * <a href=http://www.noisemachine.com/talk1/>The Noise Machine</a> - From the
- * master, Ken Perlin himself. This page contains a presentation that describes
- * Perlin noise and some of its variants. He won an Oscar for creating the
- * Perlin noise algorithm!
- *
- * <a
- * href=http://freespace.virgin.net/hugo.elias/models/m_perlin.htm>
- * Perlin Noise</a> - Hugo Elias's webpage contains a very good description of
- * Perlin noise and describes its many applications. This page gave me the
- * inspiration to create libnoise in the first place. Now that I know how to
- * generate Perlin noise, I will never again use cheesy subdivision algorithms
- * to create terrain (unless I absolutely need the speed.)
- *
- * <a
- * href=http://www.robo-murito.net/code/perlin-noise-math-faq.html>The Perlin
- * noise math FAQ</a> - A good page that describes Perlin noise in plain English
- * with only a minor amount of math. During development of libnoise, I noticed
- * that my coherent-noise function generated terrain with some "regularity" to
- * the terrain features. This page describes a better coherent-noise function
- * called <i>gradient noise</i>. This version of noise::module::Perlin uses
- * gradient coherent noise to generate Perlin noise.
- *
- * @author William Matrix Peckham
- */
+
 public class Perlin extends Module {
 
     /**
@@ -111,10 +20,6 @@ public class Perlin extends Module {
      */
     public static final double DEFAULT_PERLIN_FREQUENCY = 1.0;
 
-    /**
-     * default lacunrity for perlin noise
-     */
-    public static final double DEFFAULT_PERLIN_LACUNARITY = 2.0;
 
     /**
      * default number of octaves for perlin noise
@@ -129,12 +34,17 @@ public class Perlin extends Module {
     /**
      * default perlin noise quality
      */
-    public static final NoiseQuality DEFAULT_PERLIN_QUALITY = NoiseQuality.STD;
+    public static final NoiseQuality DEFAULT_PERLIN_QUALITY = STD;
 
     /**
      * default noise seed for perlin noise
      */
     public static final int DEFAULT_PERLIN_SEED = 0;
+
+    /**
+     * default lacunrity for perlin noise
+     */
+    public static final double DEFFAULT_PERLIN_LACUNARITY = 2.0;
 
     /**
      * maximum number of octaves for perlin
@@ -180,6 +90,60 @@ public class Perlin extends Module {
         seed = DEFAULT_PERLIN_SEED;
     }
 
+    /**
+     * frequency of the first octave
+     *
+     * @return
+     */
+    public double getFrequency() {
+        return frequency;
+    }
+
+    /**
+     * returns the lacunarity of the noise
+     *
+     * @return
+     */
+    public double getLacunarity() {
+        return lacunarity;
+    }
+
+    /**
+     * returns the quality of the noise.
+     *
+     * @return
+     */
+    public NoiseQuality getNoiseQuality() {
+        return noiseQuality;
+    }
+
+    /**
+     * Gets the number of octaves that generate the noise
+     *
+     * @return
+     */
+    public int getOctaveCount() {
+        return octaveCount;
+    }
+
+    /**
+     * Gets the persistence value of the noise
+     *
+     * @return
+     */
+    public double getPersistence() {
+        return persistence;
+    }
+
+    /**
+     * gets the seed for the noise
+     *
+     * @return
+     */
+    public int getSeed() {
+        return seed;
+    }
+
     @Override
     public int getSourceModuleCount() {
         return 0;
@@ -192,26 +156,23 @@ public class Perlin extends Module {
         double curPersistence = 1;
         double nx, ny, nz;
         int localSeed;
-
         x *= frequency;
         y *= frequency;
         z *= frequency;
-
-        for (int curOctave = 0; curOctave < octaveCount; curOctave++) {
-
+        for (int curOctave = 0; curOctave < octaveCount;
+                curOctave++) {
             //make sure that these floating point values have the same range as
             //an integer so that we can pass them to the coherent noise function
-            nx = Globals.makeIntRange(x);
-            ny = Globals.makeIntRange(y);
-            nz = Globals.makeIntRange(z);
-
+            nx = makeIntRange(x);
+            ny = makeIntRange(y);
+            nz = makeIntRange(z);
             //get the coherent noise value from the input value and add it to the
             //final result
-            localSeed = (seed + curOctave) & 0XFFFFFFFF;
-            signal = Globals.gradientCoherentNoise3D(nx, ny, nz, localSeed,
-                    noiseQuality);
+            localSeed = (seed + curOctave) & 0XFFFF_FFFF;
+            signal
+                    = gradientCoherentNoise3D(nx, ny, nz, localSeed,
+                            noiseQuality);
             value += signal * curPersistence;
-
             //prepare next octave
             x *= lacunarity;
             y *= lacunarity;
@@ -222,30 +183,12 @@ public class Perlin extends Module {
     }
 
     /**
-     * frequency of the first octave
-     *
-     * @return
-     */
-    public double getFrequency() {
-        return frequency;
-    }
-
-    /**
      * sets the frequency of the first octave
      *
      * @param frequency
      */
     public void setFrequency(double frequency) {
         this.frequency = frequency;
-    }
-
-    /**
-     * returns the lacunarity of the noise
-     *
-     * @return
-     */
-    public double getLacunarity() {
-        return lacunarity;
     }
 
     /**
@@ -262,30 +205,12 @@ public class Perlin extends Module {
     }
 
     /**
-     * returns the quality of the noise.
-     *
-     * @return
-     */
-    public NoiseQuality getNoiseQuality() {
-        return noiseQuality;
-    }
-
-    /**
      * sets the quality of the noise
      *
      * @param noiseQuality
      */
     public void setNoiseQuality(NoiseQuality noiseQuality) {
         this.noiseQuality = noiseQuality;
-    }
-
-    /**
-     * Gets the number of octaves that generate the noise
-     *
-     * @return
-     */
-    public int getOctaveCount() {
-        return octaveCount;
     }
 
     /**
@@ -307,15 +232,6 @@ public class Perlin extends Module {
     }
 
     /**
-     * Gets the persistence value of the noise
-     *
-     * @return
-     */
-    public double getPersistence() {
-        return persistence;
-    }
-
-    /**
      * Sets the persistence value of the noise.
      *
      * the persistence value controls the roughness of the noise
@@ -326,15 +242,6 @@ public class Perlin extends Module {
      */
     public void setPersistence(double persistence) {
         this.persistence = persistence;
-    }
-
-    /**
-     * gets the seed for the noise
-     *
-     * @return
-     */
-    public int getSeed() {
-        return seed;
     }
 
     /**

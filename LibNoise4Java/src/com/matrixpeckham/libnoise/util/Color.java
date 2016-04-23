@@ -7,19 +7,29 @@
  */
 package com.matrixpeckham.libnoise.util;
 
-/**
- * Defines a color.
- *
- * A color object contains four 8-bit channels: red, green, blue, and an alpha
- * (transparency) channel. Channel values range from 0 to 255.
- *
- * The alpha channel defines the transparency of the color. If the alpha channel
- * has a value of 0, the color is completely transparent. If the alpha channel
- * has a value of 255, the color is completely opaque.
- *
- * @author William Matrix Peckham
- */
+
 public class Color {
+
+
+    /**
+     * Value of the alpha(transparency) channel.
+     */
+    public short alpha;
+
+    /**
+     * Value of the blue channel.
+     */
+    public short blue;
+
+    /**
+     * Value of the green channel.
+     */
+    public short green;
+
+    /**
+     * Value of the red channel.
+     */
+    public short red;
 
     public Color() {
     }
@@ -45,26 +55,6 @@ public class Color {
         green = g;
         blue = b;
     }
-
-    /**
-     * Value of the alpha(transparency) channel.
-     */
-    public short alpha;
-
-    /**
-     * Value of the blue channel.
-     */
-    public short blue;
-
-    /**
-     * Value of the green channel.
-     */
-    public short green;
-
-    /**
-     * Value of the red channel.
-     */
-    public short red;
 
     public java.awt.Color getAWTColor() {
         return new java.awt.Color(red, green, blue, alpha);

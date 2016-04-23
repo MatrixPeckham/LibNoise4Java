@@ -7,46 +7,10 @@
  */
 package com.matrixpeckham.libnoise.module;
 
-import com.matrixpeckham.libnoise.util.Globals;
+import static com.matrixpeckham.libnoise.util.Globals.linearInterp;
 
-/**
- * Noise module that outputs a weighted blend of the output values from two
- * source modules given the output value supplied by a control module.
- *
- * <img src="moduleblend.png" alt="MODULE_BLEND_IMAGE"
- *
- * Unlike most other noise modules, the index value assigned to a source module
- * determines its role in the blending operation:
- *
- * - Source module 0 (upper left in the diagram) outputs one of the values to
- * blend.
- *
- * - Source module 1 (lower left in the diagram) outputs one of the values to
- * blend.
- *
- * - Source module 2 (bottom of the diagram) is known as the <i>control
- * module</i>. The control module determines the weight of the blending
- * operation. Negative values weigh the blend towards the output value from the
- * source module with an index value of 0. Positive values weigh the blend
- * towards the output value from the source module with an index value of 1.
- *
- * An application can pass the control module to the SetControlModule() method
- * instead of the SetSourceModule() method. This may make the application code
- * easier to read.
- *
- * This noise module uses linear interpolation to perform the blending
- * operation.
- *
- * This noise module requires three source modules.
- *
- * @author William Matrix Peckham
- */
+
 public class Blend extends Module {
-
-    @Override
-    public int getSourceModuleCount() {
-        return 3;
-    }
 
     /**
      * Returns the control module.
@@ -67,6 +31,19 @@ public class Blend extends Module {
      */
     public Module getControlModule() {
         return sourceModule[2];
+    }
+
+    @Override
+    public int getSourceModuleCount() {
+        return 3;
+    }
+
+    @Override
+    public double getValue(double x, double y, double z) {
+        double v = sourceModule[0].getValue(x, y, z);
+        double v1 = sourceModule[1].getValue(x, y, z);
+        double alpha = (sourceModule[2].getValue(x, y, z) + 1.0) / 2.0;
+        return linearInterp(v, v1, alpha);
     }
 
     /**
@@ -90,14 +67,6 @@ public class Blend extends Module {
      */
     public void setControlModule(Module m) {
         sourceModule[2] = m;
-    }
-
-    @Override
-    public double getValue(double x, double y, double z) {
-        double v = sourceModule[0].getValue(x, y, z);
-        double v1 = sourceModule[1].getValue(x, y, z);
-        double alpha = (sourceModule[2].getValue(x, y, z) + 1.0) / 2.0;
-        return Globals.linearInterp(v, v1, alpha);
     }
 
 }

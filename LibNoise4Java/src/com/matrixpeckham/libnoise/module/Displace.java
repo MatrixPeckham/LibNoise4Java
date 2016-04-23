@@ -9,38 +9,7 @@ package com.matrixpeckham.libnoise.module;
 
 import com.matrixpeckham.libnoise.util.exceptions.ExceptionNoModule;
 
-/**
- * Noise module that uses three source modules to displace each coordinate of
- * the input value before returning the output value from a source module.
- *
- * <img src="moduledisplace.png" alt="MODULE_DISPLACE_IMAGE" />
- *
- * Unlike most other noise modules, the index value assigned to a source module
- * determines its role in the displacement operation:
- *
- * - Source module 0 (left in the diagram) outputs a value.
- *
- * - Source module 1 (lower left in the diagram) specifies the offset to apply
- * to the @a x coordinate of the input value.
- *
- * - Source module 2 (lower center in the diagram) specifies the offset to apply
- * to the @a y coordinate of the input value.
- *
- * - Source module 3 (lower right in the diagram) specifies the offset to apply
- * to the @a z coordinate of the input value.
- *
- * The GetValue() method modifies the ( @a x, @a y, @a z ) coordinates of the
- * input value using the output values from the three displacement modules
- * before retrieving the output value from the source module.
- *
- * The noise::module::Turbulence noise module is a special case of the
- * displacement module; internally, there are three Perlin-noise modules that
- * perform the displacement operation.
- *
- * This noise module requires four source modules.
- *
- * @author William Matrix Peckham
- */
+
 public class Displace extends Module {
 
     @Override
@@ -85,28 +54,6 @@ public class Displace extends Module {
     }
 
     /**
-     * Returns the @a y displacement module.
-     *
-     * @returns A reference to the @a y displacement module.
-     *
-     * @pre This displacement module has been added to this noise module via a
-     * call to SetSourceModule() or SetYDisplaceModule().
-     *
-     * @throw noise::ExceptionNoModule See the preconditions for more
-     * information.
-     *
-     * The GetValue() method displaces the input value by adding the output
-     * value from this displacement module to the @a y coordinate of the input
-     * value before returning the output value from the source module.
-     */
-    public Module getyDisplaceModule() {
-        if (sourceModule == null || sourceModule[2] == null) {
-            throw new ExceptionNoModule();
-        }
-        return sourceModule[2];
-    }
-
-    /**
      * Returns the @a z displacement module.
      *
      * @returns A reference to the @a z displacement module.
@@ -126,6 +73,28 @@ public class Displace extends Module {
             throw new ExceptionNoModule();
         }
         return sourceModule[3];
+    }
+
+    /**
+     * Returns the @a y displacement module.
+     *
+     * @returns A reference to the @a y displacement module.
+     *
+     * @pre This displacement module has been added to this noise module via a
+     * call to SetSourceModule() or SetYDisplaceModule().
+     *
+     * @throw noise::ExceptionNoModule See the preconditions for more
+     * information.
+     *
+     * The GetValue() method displaces the input value by adding the output
+     * value from this displacement module to the @a y coordinate of the input
+     * value before returning the output value from the source module.
+     */
+    public Module getyDisplaceModule() {
+        if (sourceModule == null || sourceModule[2] == null) {
+            throw new ExceptionNoModule();
+        }
+        return sourceModule[2];
     }
 
     /**

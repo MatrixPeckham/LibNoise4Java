@@ -10,6 +10,7 @@ package com.matrixpeckham.libnoise.module;
 import static com.matrixpeckham.libnoise.util.Globals.DEG_TO_RAD;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import java.util.logging.Logger;
 
 /**
  * Noise module that rotates the input value around the origin before returning
@@ -52,8 +53,14 @@ public class RotatePoint extends Module {
      */
     protected double x1Matrix;
 
+    /**
+     *
+     */
     protected double x2Matrix;
 
+    /**
+     *
+     */
     protected double x3Matrix;
 
     /**
@@ -66,8 +73,14 @@ public class RotatePoint extends Module {
      */
     protected double y1Matrix;
 
+    /**
+     *
+     */
     protected double y2Matrix;
 
+    /**
+     *
+     */
     protected double y3Matrix;
 
     /**
@@ -80,8 +93,14 @@ public class RotatePoint extends Module {
      */
     protected double z1Matrix;
 
+    /**
+     *
+     */
     protected double z2Matrix;
 
+    /**
+     *
+     */
     protected double z3Matrix;
 
     /**
@@ -89,6 +108,9 @@ public class RotatePoint extends Module {
      */
     protected double zAngle;
 
+    /**
+     *
+     */
     public RotatePoint() {
         setAngles(DEFAULT_ROTATE_X, DEFAULT_ROTATE_Y, DEFAULT_ROTATE_Z);
     }
@@ -110,6 +132,7 @@ public class RotatePoint extends Module {
      * Returns the rotation angle around the @a x axis to apply to the input
      * value.
      *
+     * @return 
      * @returns The rotation angle around the @a x axis, in degrees.
      */
     public double getXAngle() {
@@ -120,6 +143,7 @@ public class RotatePoint extends Module {
      * Returns the rotation angle around the @a y axis to apply to the input
      * value.
      *
+     * @return 
      * @returns The rotation angle around the @a y axis, in degrees.
      */
     public double getYAngle() {
@@ -130,6 +154,7 @@ public class RotatePoint extends Module {
      * Returns the rotation angle around the @a z axis to apply to the input
      * value.
      *
+     * @return 
      * @returns The rotation angle around the @a z axis, in degrees.
      */
     public double getZAngle() {
@@ -207,5 +232,8 @@ public class RotatePoint extends Module {
     public void setZAngle(double zAngle) {
         setAngles(xAngle, yAngle, zAngle);
     }
+
+    private static final Logger LOG
+            = Logger.getLogger(RotatePoint.class.getName());
 
 }

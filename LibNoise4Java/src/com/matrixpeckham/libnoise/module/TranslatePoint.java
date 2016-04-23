@@ -7,23 +7,7 @@
  */
 package com.matrixpeckham.libnoise.module;
 
-/**
- * Noise module that moves the coordinates of the input value before returning
- * the output value from a source module.
- *
- * <img src="moduletranslatepoint.png" alt="MODULE_TRANSLATPOINT_IMAGE" />
- *
- * The GetValue() method moves the ( @a x, @a y, @a z ) coordinates of the input
- * value by a translation amount before returning the output value from the
- * source module. To set the translation amount, call the SetTranslation()
- * method. To set the translation amount to apply to the individual @a x, @a y,
- * or @a z coordinates, call the SetXTranslation(), SetYTranslation() or
- * SetZTranslation() methods, respectively.
- *
- * This noise module requires one source module.
- *
- * @author William Matrix Peckham
- */
+
 public class TranslatePoint extends Module {
 
     /**
@@ -62,6 +46,17 @@ public class TranslatePoint extends Module {
         zTranslation = DEFAULT_TRANSLATE_POINT_Z;
     }
 
+    @Override
+    public int getSourceModuleCount() {
+        return 1;
+    }
+
+    @Override
+    public double getValue(double x, double y, double z) {
+        return sourceModule[0].getValue(x + xTranslation, y + yTranslation, z
+                + zTranslation);
+    }
+
     /**
      * gets x translation
      *
@@ -69,15 +64,6 @@ public class TranslatePoint extends Module {
      */
     public double getxTranslation() {
         return xTranslation;
-    }
-
-    /**
-     * sets x translation
-     *
-     * @param xTranslation
-     */
-    public void setxTranslation(double xTranslation) {
-        this.xTranslation = xTranslation;
     }
 
     /**
@@ -90,35 +76,12 @@ public class TranslatePoint extends Module {
     }
 
     /**
-     * sets y translation
-     *
-     * @param yTranslation
-     */
-    public void setyTranslation(double yTranslation) {
-        this.yTranslation = yTranslation;
-    }
-
-    /**
      * get z translation
      *
      * @return
      */
     public double getzTranslation() {
         return zTranslation;
-    }
-
-    /**
-     * sets z translation
-     *
-     * @param zTranslation
-     */
-    public void setzTranslation(double zTranslation) {
-        this.zTranslation = zTranslation;
-    }
-
-    @Override
-    public int getSourceModuleCount() {
-        return 1;
     }
 
     /**
@@ -154,10 +117,31 @@ public class TranslatePoint extends Module {
         zTranslation = z;
     }
 
-    @Override
-    public double getValue(double x, double y, double z) {
-        return sourceModule[0].getValue(x + xTranslation, y + yTranslation, z
-                + zTranslation);
+    /**
+     * sets x translation
+     *
+     * @param xTranslation
+     */
+    public void setxTranslation(double xTranslation) {
+        this.xTranslation = xTranslation;
+    }
+
+    /**
+     * sets y translation
+     *
+     * @param yTranslation
+     */
+    public void setyTranslation(double yTranslation) {
+        this.yTranslation = yTranslation;
+    }
+
+    /**
+     * sets z translation
+     *
+     * @param zTranslation
+     */
+    public void setzTranslation(double zTranslation) {
+        this.zTranslation = zTranslation;
     }
 
 }

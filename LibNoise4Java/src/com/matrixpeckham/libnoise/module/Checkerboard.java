@@ -7,7 +7,9 @@
  */
 package com.matrixpeckham.libnoise.module;
 
-import com.matrixpeckham.libnoise.util.Globals;
+import static com.matrixpeckham.libnoise.util.Globals.makeIntRange;
+import static java.lang.Math.floor;
+import java.util.logging.Logger;
 
 /**
  * Noise module that outputs a checkerboard pattern.
@@ -33,10 +35,13 @@ public class Checkerboard extends Module {
 
     @Override
     public double getValue(double x, double y, double z) {
-        int ix = (int) Math.floor(Globals.makeIntRange(x));
-        int iy = (int) Math.floor(Globals.makeIntRange(y));
-        int iz = (int) Math.floor(Globals.makeIntRange(z));
+        int ix = (int) floor(makeIntRange(x));
+        int iy = (int) floor(makeIntRange(y));
+        int iz = (int) floor(makeIntRange(z));
         return (ix & 1 ^ iy & 1 ^ iz & 1) != 0 ? -1 : 1;
     }
+
+    private static final Logger LOG
+            = Logger.getLogger(Checkerboard.class.getName());
 
 }

@@ -7,12 +7,20 @@
  */
 package com.matrixpeckham.libnoise.util.exceptions;
 
+import java.util.logging.Logger;
+import static java.util.logging.Logger.getLogger;
+
 /**
  * Unknown exception was raised
  *
  * @author William Matrix Peckham
  */
 public class ExceptionUnknown extends NoiseException {
+
+    private static final Logger LOG
+            = getLogger(ExceptionUnknown.class.getName());
+
+    private static final long serialVersionUID = 1L;
 
     public ExceptionUnknown() {
     }

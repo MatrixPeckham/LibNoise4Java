@@ -7,6 +7,8 @@
  */
 package com.matrixpeckham.libnoise.module;
 
+import java.util.logging.Logger;
+
 /**
  * Noise module that inverts the output value from a source module.
  *
@@ -27,5 +29,7 @@ public class Invert extends Module {
     public double getValue(double x, double y, double z) {
         return -sourceModule[0].getValue(x, y, z);
     }
+
+    private static final Logger LOG = Logger.getLogger(Invert.class.getName());
 
 }

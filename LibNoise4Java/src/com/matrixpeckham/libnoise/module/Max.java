@@ -7,7 +7,8 @@
  */
 package com.matrixpeckham.libnoise.module;
 
-import com.matrixpeckham.libnoise.util.Globals;
+import static com.matrixpeckham.libnoise.util.Globals.getMax;
+import java.util.logging.Logger;
 
 /**
  * Noise module that outputs the larger of the two output values from two source
@@ -30,7 +31,9 @@ public class Max extends Module {
     public double getValue(double x, double y, double z) {
         double v0 = sourceModule[0].getValue(x, y, z);
         double v1 = sourceModule[1].getValue(x, y, z);
-        return Globals.getMax(v0, v1);
+        return getMax(v0, v1);
     }
+
+    private static final Logger LOG = Logger.getLogger(Max.class.getName());
 
 }

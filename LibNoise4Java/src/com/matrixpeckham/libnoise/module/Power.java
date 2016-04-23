@@ -7,6 +7,9 @@
  */
 package com.matrixpeckham.libnoise.module;
 
+import static java.lang.Math.pow;
+import java.util.logging.Logger;
+
 /**
  * Noise module that raises the output value from a first source module to the
  * power of the output value from a second source module.
@@ -30,8 +33,10 @@ public class Power extends Module {
 
     @Override
     public double getValue(double x, double y, double z) {
-        return Math.pow(sourceModule[0].getValue(x, y, z), sourceModule[1].
+        return pow(sourceModule[0].getValue(x, y, z), sourceModule[1].
                 getValue(x, y, z));
     }
+
+    private static final Logger LOG = Logger.getLogger(Power.class.getName());
 
 }

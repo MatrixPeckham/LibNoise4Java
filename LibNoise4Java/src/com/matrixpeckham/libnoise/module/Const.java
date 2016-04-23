@@ -7,20 +7,7 @@
  */
 package com.matrixpeckham.libnoise.module;
 
-/**
- * Noise module that outputs a constant value.
- *
- * <img src="moduleconst.png" alt="MODULE_CONST_IMG" />
- *
- * To specify the constant value, call the setConstValue() method.
- *
- * This noise module is not useful by itself, but it is often used as a source
- * module for other noise modules.
- *
- * This noise module does not require any source modules.
- *
- * @author William Matrix Peckham
- */
+
 public class Const extends Module {
 
     /**
@@ -34,29 +21,20 @@ public class Const extends Module {
     protected double constValue;
 
     /**
+     * Default constructor sets the value to the default.
+     */
+    public Const() {
+        //super(0);
+        constValue = DEFAULT_CONST_VALUE;
+    }
+
+    /**
      * Gets the value that this module is set to return.
      *
      * @return
      */
     public double getConstValue() {
         return constValue;
-    }
-
-    /**
-     * Sets the value that the module will return.
-     *
-     * @param constValue
-     */
-    public void setConstValue(double constValue) {
-        this.constValue = constValue;
-    }
-
-    /**
-     * Default constructor sets the value to the default.
-     */
-    public Const() {
-        //super(0);
-        constValue = DEFAULT_CONST_VALUE;
     }
 
     /**
@@ -80,6 +58,15 @@ public class Const extends Module {
     @Override
     public double getValue(double x, double y, double z) {
         return constValue;
+    }
+
+    /**
+     * Sets the value that the module will return.
+     *
+     * @param constValue
+     */
+    public void setConstValue(double constValue) {
+        this.constValue = constValue;
     }
 
 }

@@ -176,6 +176,8 @@ import com.matrixpeckham.libnoise.util.exceptions.ExceptionNoModule;
  */
 public abstract class Module {
 
+    protected Module[] sourceModule;
+
     /**
      * Constructor
      *
@@ -255,6 +257,5 @@ public abstract class Module {
         sourceModule[index] = source;
     }
 
-    protected Module[] sourceModule;
 
 }

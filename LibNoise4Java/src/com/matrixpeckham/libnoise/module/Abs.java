@@ -7,6 +7,9 @@
  */
 package com.matrixpeckham.libnoise.module;
 
+import static java.lang.Math.abs;
+import java.util.logging.Logger;
+
 /**
  * Noise module that outputs the absolute value of the output value of a source
  * module.
@@ -26,7 +29,9 @@ public class Abs extends Module {
 
     @Override
     public double getValue(double x, double y, double z) {
-        return Math.abs(sourceModule[0].getValue(x, y, z));
+        return abs(sourceModule[0].getValue(x, y, z));
     }
+
+    private static final Logger LOG = Logger.getLogger(Abs.class.getName());
 
 }

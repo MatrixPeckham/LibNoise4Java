@@ -9,33 +9,13 @@ package com.matrixpeckham.libnoise.model;
 
 import com.matrixpeckham.libnoise.module.Module;
 
-/**
- * Model that defines the surface of a plane.
- *
- * This model returns an output value from a noise module given the coordinates
- * of an input value located on the surface of an ( @a x,
- *
- * @a z ) plane.
- *
- * To generate an output value, pass the ( @a x, @a z ) coordinates of an input
- * value to the GetValue() method.
- *
- * This model is useful for creating: - two-dimensional textures - terrain
- * height maps for local areas
- *
- * This plane extends infinitely in both directions.
- * @author William Matrix Peckham
- */
+
 public class Plane {
 
     private Module module;
 
     public Module getModule() {
         return module;
-    }
-
-    public void setModule(Module module) {
-        this.module = module;
     }
 
     /**
@@ -55,6 +35,10 @@ public class Plane {
      */
     public double getValue(double x, double z) {
         return module.getValue(x, 0, z);
+    }
+
+    public void setModule(Module module) {
+        this.module = module;
     }
 
 }

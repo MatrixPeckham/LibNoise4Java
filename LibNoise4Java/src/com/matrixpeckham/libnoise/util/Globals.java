@@ -7,30 +7,27 @@
  */
 package com.matrixpeckham.libnoise.util;
 
-/**
- * This class houses all the global variables and functions found in the
- * noiselib library.
- * <br/> These fields and methods will be static and some may be grouped into
- * static classes for breakdown by file if appropriate.
- *
- * @author William Matrix Peckham
- */
+import static com.matrixpeckham.libnoise.util.NoiseQuality.STD;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 public class Globals {
+
+    /**
+     * Number of meters per point in a Terragen terrain (TER) file.
+     */
+    public static final double DEFAULT_METERS_PER_POINT = 30.0;
+
+    /**
+     * Same as the DEFAULT_METERS_PER_POINT constant, but for us canuckleheads.
+     */
+    public static final double DEFAULT_METRES_PER_POINT
+            = DEFAULT_METERS_PER_POINT;
 
     /**
      * alias for Math.PI
      */
     public static final double PI = 3.1415926535897932385;
-
-    /**
-     * Square root of 2
-     */
-    public static final double SQRT_2 = 1.4142135623730950488;
-
-    /**
-     * Square root of 3
-     */
-    public static final double SQRT_3 = 1.7320508075688772935;
 
     /**
      * Converts an angle from degrees to radians
@@ -43,14 +40,14 @@ public class Globals {
     public static final double RAD_TO_DEG = 1.0 / DEG_TO_RAD;
 
     /**
-     * The maximum width of a raster.
-     */
-    public static final int RASTER_MAX_WIDTH = 32767;
-
-    /**
      * The maximum height of a raster.
      */
-    public static final int RASTER_MAX_HEIGHT = 32767;
+    public static final int RASTER_MAX_HEIGHT = 32_767;
+
+    /**
+     * The maximum width of a raster.
+     */
+    public static final int RASTER_MAX_WIDTH = 32_767;
 
     /**
      * The raster's stride length must be a multiple of this constant. may not
@@ -58,16 +55,27 @@ public class Globals {
      */
     public static final int RASTER_STRIDE_BOUNDARY = 4;
 
-    /**
-     * Number of meters per point in a Terragen terrain (TER) file.
-     */
-    public static final double DEFAULT_METERS_PER_POINT = 30.0;
+    private static final int SEED_NOISE_GEN = 1_013;
+
+    private static final int SHIFT_NOISE_GEN
+            = 8;
 
     /**
-     * Same as the DEFAULT_METERS_PER_POINT constant, but for us canuckleheads.
+     * Square root of 2
      */
-    public static final double DEFAULT_METRES_PER_POINT
-            = DEFAULT_METERS_PER_POINT;
+    public static final double SQRT_2 = 1.4142135623730950488;
+
+    /**
+     * Square root of 3
+     */
+    public static final double SQRT_3 = 1.7320508075688772935;
+
+    //we implement version 2 noise from noiselib here and do not offer version 1.
+    private static final int X_NOISE_GEN = 1_619;
+
+    private static final int Y_NOISE_GEN = 31_337;
+
+    private static final int Z_NOISE_GEN = 6_971;
 
     /**
      * A table of 256 random normalized vectors. Each row is an (x, y, z, 0)
@@ -339,6 +347,16 @@ public class Globals {
     };
 
     /**
+     * Performs linear interpolation between two 8-bit channel values.
+     */
+    public static short blendChannel(short channel0, short channel1,
+            double alpha) {
+        double c0 = channel0 / 255.0;
+        double c1 = channel1 / 255.0;
+        return (short) (((c1 * alpha) + (c0 * (1.0f - alpha))) * 255.0f);
+    }
+
+    /**
      * Clamps a value onto a clamping range. @param value The value to clamp.
      *
      * @param lowerBound The lower bound of the clamping range.
@@ -357,6 +375,31 @@ public class Globals {
         } else {
             return value;
         }
+    }
+
+    /**
+     * Performs cubic interpolation between two values bound between two other
+     * values.
+     *
+     * @param n0 The value before the first value.
+     * @param n1 The first value.
+     * @param n2 The second value.
+     * @param n3 The value after the second value.
+     * @param a The alpha value
+     * @return The alpha value
+     *
+     * The alpha value should range from 0.0 to 1.0. If the alpha value is 0.0,
+     * this function returns @a n1. If the alpha value is 1.0, this function
+     * returns @a n2.
+     *
+     */
+    public static double cubicInterp(double n0, double n1, double n2, double n3,
+            double a) {
+        double p = (n3 - n2) - (n0 - n1);
+        double q = (n0 - n1) - p;
+        double r = n2 - n0;
+        double s = n1;
+        return p * a * a * a + q * a * a + r * a + s;
     }
 
     /**
@@ -390,35 +433,6 @@ public class Globals {
     }
 
     /**
-     * Modifies a floating-point value so that it can be stored in a
-     * noise::int32 variable.
-     *
-     * @param n A floating-point number.
-     *
-     * @return The modified floating-point number.
-     *
-     * This function does not modify @a n.
-     *
-     * In libnoise, the noise-generating algorithms are all integer-based; they
-     * use variables of type noise::int32. Before calling a noise function, pass
-     * the @a x, @a y, and @a z coordinates to this function to ensure that
-     * these coordinates can be cast to a noise::int32 value.
-     *
-     * Although you could do a straight cast from double to noise::int32, the
-     * resulting value may differ between platforms. By using this function, you
-     * ensure that the resulting value is identical between platforms.
-     */
-    public static double makeIntRange(double n) {
-        if (n >= 1073741824.0) {
-            return (2.0 * (n % 1073741824.0)) - 1073741824.0;
-        } else if (n <= -1073741824.0) {
-            return (2.0 * (n % 1073741824.0)) + 1073741824.0;
-        } else {
-            return n;
-        }
-    }
-
-    /**
      * Generates a gradient-coherent-noise value from the coordinates of a
      * three-dimensional input value.
      *
@@ -445,32 +459,24 @@ public class Globals {
         int y1 = y0 + 1;
         int z0 = (z > 0.0 ? (int) z : (int) z - 1);
         int z1 = z0 + 1;
-
-        // Map the difference between the coordinates of the input value and the
-        // coordinates of the cube's outer-lower-left vertex onto an S-curve.
         double xs = 0, ys = 0, zs = 0;
         switch (noiseQuality) {
             case FAST:
-                xs = (x - (double) x0);
-                ys = (y - (double) y0);
-                zs = (z - (double) z0);
+                xs = (x - x0);
+                ys = (y - y0);
+                zs = (z - z0);
                 break;
             case STD:
-                xs = sCurve3(x - (double) x0);
-                ys = sCurve3(y - (double) y0);
-                zs = sCurve3(z - (double) z0);
+                xs = sCurve3(x - x0);
+                ys = sCurve3(y - y0);
+                zs = sCurve3(z - z0);
                 break;
             case BEST:
-                xs = sCurve5(x - (double) x0);
-                ys = sCurve5(y - (double) y0);
-                zs = sCurve5(z - (double) z0);
+                xs = sCurve5(x - x0);
+                ys = sCurve5(y - y0);
+                zs = sCurve5(z - z0);
                 break;
         }
-
-        // Now calculate the noise values at each vertex of the cube.  To generate
-        // the coherent-noise value at the input point, interpolate these eight
-        // noise values using the S-curve value as the interpolant (trilinear
-        // interpolation.)
         double n0, n1, ix0, ix1, iy0, iy1;
         n0 = gradientNoise3D(x, y, z, x0, y0, z0, seed);
         n1 = gradientNoise3D(x, y, z, x1, y0, z0, seed);
@@ -486,7 +492,6 @@ public class Globals {
         n1 = gradientNoise3D(x, y, z, x1, y1, z1, seed);
         ix1 = linearInterp(n0, n1, xs);
         iy1 = linearInterp(ix0, ix1, ys);
-
         return linearInterp(iy0, iy1, zs);
     }
 
@@ -506,7 +511,7 @@ public class Globals {
      * <i>value</i> noise, see the comments for the GradientNoise3D() function.
      */
     public static double gradientCoherentNoise3D(double x, double y, double z) {
-        return gradientCoherentNoise3D(x, y, z, 0, NoiseQuality.STD);
+        return gradientCoherentNoise3D(x, y, z, 0, STD);
     }
 
     /**
@@ -551,29 +556,25 @@ public class Globals {
      * returns the same output value if the same input value is passed to it.
      */
     public static double gradientNoise3D(double fx, double fy, double fz, int ix,
-            int iy,
-            int iz, int seed) {
+            int iy, int iz, int seed) {
         // Randomly generate a gradient vector given the integer coordinates of the
         // input value.  This implementation generates a random number and uses it
         // as an index into a normalized-vector lookup table.
-        int vectorIndex = (X_NOISE_GEN * ix
+        int vectorIndex
+                = (X_NOISE_GEN * ix
                 + Y_NOISE_GEN * iy
                 + Z_NOISE_GEN * iz
-                + SEED_NOISE_GEN * seed)
-                & 0xffffffff;
+                + SEED_NOISE_GEN * seed) & 0xffff_ffff;
         vectorIndex ^= (vectorIndex >> SHIFT_NOISE_GEN);
         vectorIndex &= 0xff;
-
         double xvGradient = randomVectors[(vectorIndex << 2)];
         double yvGradient = randomVectors[(vectorIndex << 2) + 1];
         double zvGradient = randomVectors[(vectorIndex << 2) + 2];
-
         // Set up us another vector equal to the distance between the two vectors
         // passed to this function.
-        double xvPoint = (fx - (double) ix);
-        double yvPoint = (fy - (double) iy);
-        double zvPoint = (fz - (double) iz);
-
+        double xvPoint = fx - ix;
+        double yvPoint = fy - iy;
+        double zvPoint = fz - iz;
         // Now compute the dot product of the gradient vector with the distance
         // vector.  The resulting value is gradient noise.  Apply a scaling value
         // so that this noise value ranges from -1.0 to 1.0.
@@ -624,8 +625,7 @@ public class Globals {
      * returns the same output value if the same input value is passed to it.
      */
     public static double gradientNoise3D(double fx, double fy, double fz, int ix,
-            int iy,
-            int iz) {
+            int iy, int iz) {
         return gradientNoise3D(fx, fy, fz, ix, iy, iz, 0);
     }
 
@@ -643,13 +643,13 @@ public class Globals {
     public static int intValueNoise3D(int x, int y, int z, int seed) {
         // All constants are primes and must remain prime in order for this noise
         // function to work correctly.
-        int n = (X_NOISE_GEN * x
+        int n
+                = (X_NOISE_GEN * x
                 + Y_NOISE_GEN * y
                 + Z_NOISE_GEN * z
-                + SEED_NOISE_GEN * seed)
-                & 0x7fffffff;
+                + SEED_NOISE_GEN * seed) & 0x7fff_ffff;
         n = (n >> 13) ^ n;
-        return (n * (n * n * 60493 + 19990303) + 1376312589) & 0x7fffffff;
+        return (n * (n * n * 60_493 + 19_990_303) + 1_376_312_589) & 0x7fff_ffff;
     }
 
     /**
@@ -668,160 +668,24 @@ public class Globals {
     }
 
     /**
-     * Generates a value-coherent-noise value from the coordinates of a
-     * three-dimensional input value.
+     * Converts a latitude/longitude coordinates on a unit sphere into 3D
+     * Cartesian coordinates.
      *
-     * @param x The @a x coordinate of the input value.
-     * @param y The @a y coordinate of the input value.
-     * @param z The @a z coordinate of the input value.
-     * @param seed The random number seed.
-     * @param noiseQuality The quality of the coherent-noise.
+     * @param lat Latitude in degrees
+     * @param lon Longitude in degrees
+     * @return Vec3 object that has the coordinates of the longitude/latitude.
      *
-     * @return The generated value-coherent-noise value.
+     * lat should be in range -90 to 90
      *
-     * The return value ranges from -1.0 to +1.0.
-     *
-     * For an explanation of the difference between <i>gradient</i> noise and
-     * <i>value</i> noise, see the comments for the GradientNoise3D() function.
+     * lon should be in range -180 to 180
      */
-    public static double valueCoherentNoise3D(double x, double y, double z,
-            int seed, NoiseQuality noiseQuality) {
-        // Create a unit-length cube aligned along an integer boundary.  This cube
-        // surrounds the input point.
-        int x0 = (x > 0.0 ? (int) x : (int) x - 1);
-        int x1 = x0 + 1;
-        int y0 = (y > 0.0 ? (int) y : (int) y - 1);
-        int y1 = y0 + 1;
-        int z0 = (z > 0.0 ? (int) z : (int) z - 1);
-        int z1 = z0 + 1;
-
-        // Map the difference between the coordinates of the input value and the
-        // coordinates of the cube's outer-lower-left vertex onto an S-curve.
-        double xs = 0, ys = 0, zs = 0;
-        switch (noiseQuality) {
-            case FAST:
-                xs = (x - (double) x0);
-                ys = (y - (double) y0);
-                zs = (z - (double) z0);
-                break;
-            case STD:
-                xs = sCurve3(x - (double) x0);
-                ys = sCurve3(y - (double) y0);
-                zs = sCurve3(z - (double) z0);
-                break;
-            case BEST:
-                xs = sCurve5(x - (double) x0);
-                ys = sCurve5(y - (double) y0);
-                zs = sCurve5(z - (double) z0);
-                break;
-        }
-
-        // Now calculate the noise values at each vertex of the cube.  To generate
-        // the coherent-noise value at the input point, interpolate these eight
-        // noise values using the S-curve value as the interpolant (trilinear
-        // interpolation.)
-        double n0, n1, ix0, ix1, iy0, iy1;
-        n0 = valueNoise3D(x0, y0, z0, seed);
-        n1 = valueNoise3D(x1, y0, z0, seed);
-        ix0 = linearInterp(n0, n1, xs);
-        n0 = valueNoise3D(x0, y1, z0, seed);
-        n1 = valueNoise3D(x1, y1, z0, seed);
-        ix1 = linearInterp(n0, n1, xs);
-        iy0 = linearInterp(ix0, ix1, ys);
-        n0 = valueNoise3D(x0, y0, z1, seed);
-        n1 = valueNoise3D(x1, y0, z1, seed);
-        ix0 = linearInterp(n0, n1, xs);
-        n0 = valueNoise3D(x0, y1, z1, seed);
-        n1 = valueNoise3D(x1, y1, z1, seed);
-        ix1 = linearInterp(n0, n1, xs);
-        iy1 = linearInterp(ix0, ix1, ys);
-        return linearInterp(iy0, iy1, zs);
-    }
-
-    /**
-     * Generates a value-coherent-noise value from the coordinates of a
-     * three-dimensional input value.
-     *
-     * @param x The @a x coordinate of the input value.
-     * @param y The @a y coordinate of the input value.
-     * @param z The @a z coordinate of the input value.
-     * @param seed The random number seed.
-     * @param noiseQuality The quality of the coherent-noise.
-     *
-     * @return The generated value-coherent-noise value.
-     *
-     * The return value ranges from -1.0 to +1.0.
-     *
-     * For an explanation of the difference between <i>gradient</i> noise and
-     * <i>value</i> noise, see the comments for the GradientNoise3D() function.
-     */
-    public static double valueCoherentNoise3D(double x, double y, double z) {
-        return valueCoherentNoise3D(x, y, z, 0, NoiseQuality.STD);
-    }
-
-    /**
-     * Generates a value-noise value from the coordinates of a three-dimensional
-     * input value.
-     *
-     * @param x The @a x coordinate of the input value.
-     * @param y The @a y coordinate of the input value.
-     * @param z The @a z coordinate of the input value.
-     * @param seed A random number seed.
-     *
-     * @return The generated value-noise value.
-     *
-     * The return value ranges from -1.0 to +1.0.
-     *
-     * A noise function differs from a random-number generator because it always
-     * returns the same output value if the same input value is passed to it.
-     */
-    public static double valueNoise3D(int x, int y, int z, int seed) {
-        return 1.0 - ((double) intValueNoise3D(x, y, z, seed) / 1073741824.0);
-    }
-
-    /**
-     * Generates a value-noise value from the coordinates of a three-dimensional
-     * input value.
-     *
-     * @param x The @a x coordinate of the input value.
-     * @param y The @a y coordinate of the input value.
-     * @param z The @a z coordinate of the input value.
-     * @param seed A random number seed.
-     *
-     * @return The generated value-noise value.
-     *
-     * The return value ranges from -1.0 to +1.0.
-     *
-     * A noise function differs from a random-number generator because it always
-     * returns the same output value if the same input value is passed to it.
-     */
-    public static double valueNoise3D(int x, int y, int z) {
-        return valueNoise3D(x, y, z, 0);
-    }
-
-    /**
-     * Performs cubic interpolation between two values bound between two other
-     * values.
-     *
-     * @param n0 The value before the first value.
-     * @param n1 The first value.
-     * @param n2 The second value.
-     * @param n3 The value after the second value.
-     * @param a The alpha value
-     * @return The alpha value
-     *
-     * The alpha value should range from 0.0 to 1.0. If the alpha value is 0.0,
-     * this function returns @a n1. If the alpha value is 1.0, this function
-     * returns @a n2.
-     *
-     */
-    public static double cubicInterp(double n0, double n1, double n2, double n3,
-            double a) {
-        double p = (n3 - n2) - (n0 - n1);
-        double q = (n0 - n1) - p;
-        double r = n2 - n0;
-        double s = n1;
-        return p * a * a * a + q * a * a + r * a + s;
+    public static Vec3 latLonToXYZ(double lat, double lon) {
+        Vec3 vec = new Vec3();
+        double r = cos(DEG_TO_RAD * lat);
+        vec.x = r * cos(DEG_TO_RAD * lon);
+        vec.y = sin(DEG_TO_RAD * lat);
+        vec.z = r * sin(DEG_TO_RAD * lon);
+        return vec;
     }
 
     /**
@@ -838,6 +702,47 @@ public class Globals {
      */
     public static double linearInterp(double n0, double n1, double a) {
         return ((1.0 - a) * n0) + (a * n1);
+    }
+
+    /**
+     * Performs linear interpolation between two colors and stores the result in
+     * out.
+     */
+    public static void linearInterpColor(Color color0, Color color1,
+            double alpha, Color out) {
+        out.alpha = blendChannel(color0.alpha, color1.alpha, alpha);
+        out.blue = blendChannel(color0.blue, color1.blue, alpha);
+        out.green = blendChannel(color0.green, color1.green, alpha);
+        out.red = blendChannel(color0.red, color1.red, alpha);
+    }
+
+    /**
+     * Modifies a floating-point value so that it can be stored in a
+     * noise::int32 variable.
+     *
+     * @param n A floating-point number.
+     *
+     * @return The modified floating-point number.
+     *
+     * This function does not modify @a n.
+     *
+     * In libnoise, the noise-generating algorithms are all integer-based; they
+     * use variables of type noise::int32. Before calling a noise function, pass
+     * the @a x, @a y, and @a z coordinates to this function to ensure that
+     * these coordinates can be cast to a noise::int32 value.
+     *
+     * Although you could do a straight cast from double to noise::int32, the
+     * resulting value may differ between platforms. By using this function, you
+     * ensure that the resulting value is identical between platforms.
+     */
+    public static double makeIntRange(double n) {
+        if (n >= 1073741824.0) {
+            return (2.0 * (n % 1073741824.0)) - 1073741824.0;
+        } else if (n <= -1073741824.0) {
+            return (2.0 * (n % 1073741824.0)) + 1073741824.0;
+        } else {
+            return n;
+        }
     }
 
     /**
@@ -874,60 +779,127 @@ public class Globals {
     }
 
     /**
-     * Converts a latitude/longitude coordinates on a unit sphere into 3D
-     * Cartesian coordinates.
+     * Generates a value-coherent-noise value from the coordinates of a
+     * three-dimensional input value.
      *
-     * @param lat Latitude in degrees
-     * @param lon Longitude in degrees
-     * @return Vec3 object that has the coordinates of the longitude/latitude.
+     * @param x The @a x coordinate of the input value.
+     * @param y The @a y coordinate of the input value.
+     * @param z The @a z coordinate of the input value.
+     * @param seed The random number seed.
+     * @param noiseQuality The quality of the coherent-noise.
      *
-     * lat should be in range -90 to 90
+     * @return The generated value-coherent-noise value.
      *
-     * lon should be in range -180 to 180
+     * The return value ranges from -1.0 to +1.0.
+     *
+     * For an explanation of the difference between <i>gradient</i> noise and
+     * <i>value</i> noise, see the comments for the GradientNoise3D() function.
      */
-    public static Vec3 latLonToXYZ(double lat, double lon) {
-        Vec3 vec = new Vec3();
-
-        double r = Math.cos(DEG_TO_RAD * lat);
-
-        vec.x = r * Math.cos(DEG_TO_RAD * lon);
-        vec.y = Math.sin(DEG_TO_RAD * lat);
-        vec.z = r * Math.sin(DEG_TO_RAD * lon);
-
-        return vec;
+    public static double valueCoherentNoise3D(double x, double y, double z,
+            int seed, NoiseQuality noiseQuality) {
+        // Create a unit-length cube aligned along an integer boundary.  This cube
+        // surrounds the input point.
+        int x0 = (x > 0.0 ? (int) x : (int) x - 1);
+        int x1 = x0 + 1;
+        int y0 = (y > 0.0 ? (int) y : (int) y - 1);
+        int y1 = y0 + 1;
+        int z0 = (z > 0.0 ? (int) z : (int) z - 1);
+        int z1 = z0 + 1;
+        double xs = 0, ys = 0, zs = 0;
+        switch (noiseQuality) {
+            case FAST:
+                xs = (x - x0);
+                ys = (y - y0);
+                zs = (z - z0);
+                break;
+            case STD:
+                xs = sCurve3(x - x0);
+                ys = sCurve3(y - y0);
+                zs = sCurve3(z - z0);
+                break;
+            case BEST:
+                xs = sCurve5(x - x0);
+                ys = sCurve5(y - y0);
+                zs = sCurve5(z - z0);
+                break;
+        }
+        double n0, n1, ix0, ix1, iy0, iy1;
+        n0 = valueNoise3D(x0, y0, z0, seed);
+        n1 = valueNoise3D(x1, y0, z0, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = valueNoise3D(x0, y1, z0, seed);
+        n1 = valueNoise3D(x1, y1, z0, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy0 = linearInterp(ix0, ix1, ys);
+        n0 = valueNoise3D(x0, y0, z1, seed);
+        n1 = valueNoise3D(x1, y0, z1, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = valueNoise3D(x0, y1, z1, seed);
+        n1 = valueNoise3D(x1, y1, z1, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy1 = linearInterp(ix0, ix1, ys);
+        return linearInterp(iy0, iy1, zs);
     }
 
-    //we implement version 2 noise from noiselib here and do not offer version 1.
-    private static final int X_NOISE_GEN = 1619;
-
-    private static final int Y_NOISE_GEN = 31337;
-
-    private static final int Z_NOISE_GEN = 6971;
-
-    private static final int SEED_NOISE_GEN = 1013;
-
-    private static final int SHIFT_NOISE_GEN = 8;
-
     /**
-     * Performs linear interpolation between two 8-bit channel values.
+     * Generates a value-coherent-noise value from the coordinates of a
+     * three-dimensional input value.
+     *
+     * @param x The @a x coordinate of the input value.
+     * @param y The @a y coordinate of the input value.
+     * @param z The @a z coordinate of the input value.
+     * @param seed The random number seed.
+     * @param noiseQuality The quality of the coherent-noise.
+     *
+     * @return The generated value-coherent-noise value.
+     *
+     * The return value ranges from -1.0 to +1.0.
+     *
+     * For an explanation of the difference between <i>gradient</i> noise and
+     * <i>value</i> noise, see the comments for the GradientNoise3D() function.
      */
-    public static short blendChannel(short channel0, short channel1,
-            double alpha) {
-        double c0 = channel0 / 255.0;
-        double c1 = channel1 / 255.0;
-        return (short) (((c1 * alpha) + (c0 * (1.0f - alpha))) * 255.0f);
+    public static double valueCoherentNoise3D(double x, double y, double z) {
+        return valueCoherentNoise3D(x, y, z, 0, STD);
     }
 
     /**
-     * Performs linear interpolation between two colors and stores the result in
-     * out.
+     * Generates a value-noise value from the coordinates of a three-dimensional
+     * input value.
+     *
+     * @param x The @a x coordinate of the input value.
+     * @param y The @a y coordinate of the input value.
+     * @param z The @a z coordinate of the input value.
+     * @param seed A random number seed.
+     *
+     * @return The generated value-noise value.
+     *
+     * The return value ranges from -1.0 to +1.0.
+     *
+     * A noise function differs from a random-number generator because it always
+     * returns the same output value if the same input value is passed to it.
      */
-    public static void linearInterpColor(Color color0, Color color1,
-            double alpha, Color out) {
-        out.alpha = blendChannel(color0.alpha, color1.alpha, alpha);
-        out.blue = blendChannel(color0.blue, color1.blue, alpha);
-        out.green = blendChannel(color0.green, color1.green, alpha);
-        out.red = blendChannel(color0.red, color1.red, alpha);
+    public static double valueNoise3D(int x, int y, int z, int seed) {
+        return 1.0 - (intValueNoise3D(x, y, z, seed) / 1073741824.0);
+    }
+
+    /**
+     * Generates a value-noise value from the coordinates of a three-dimensional
+     * input value.
+     *
+     * @param x The @a x coordinate of the input value.
+     * @param y The @a y coordinate of the input value.
+     * @param z The @a z coordinate of the input value.
+     * @param seed A random number seed.
+     *
+     * @return The generated value-noise value.
+     *
+     * The return value ranges from -1.0 to +1.0.
+     *
+     * A noise function differs from a random-number generator because it always
+     * returns the same output value if the same input value is passed to it.
+     */
+    public static double valueNoise3D(int x, int y, int z) {
+        return valueNoise3D(x, y, z, 0);
     }
 
 }
