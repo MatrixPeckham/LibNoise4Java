@@ -9,10 +9,11 @@ package com.matrixpeckham.libnoise.model;
 
 import com.matrixpeckham.libnoise.module.Module;
 
-
 public class Plane {
 
-    private Module module;
+    private Module module = null;
+
+    boolean useXY = false;
 
     public Module getModule() {
         return module;
@@ -34,7 +35,15 @@ public class Plane {
      * SetModule() method.
      */
     public double getValue(double x, double z) {
-        return module.getValue(x, 0, z);
+        if (!useXY) {
+            return module.getValue(x, 0, z);
+        } else {
+            return module.getValue(x, z, 0);
+        }
+    }
+
+    public void useXY() {
+        useXY = true;
     }
 
     public void setModule(Module module) {

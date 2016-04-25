@@ -7,9 +7,7 @@
  */
 package com.matrixpeckham.libnoise.util;
 
-
 public class Color {
-
 
     /**
      * Value of the alpha(transparency) channel.
@@ -54,6 +52,26 @@ public class Color {
         red = r;
         green = g;
         blue = b;
+        alpha = a;
+    }
+
+    public Color(int r, int g, int b, int a) {
+        if (r < 0 || r > 255) {
+            throw new IllegalArgumentException();
+        }
+        if (g < 0 || g > 255) {
+            throw new IllegalArgumentException();
+        }
+        if (b < 0 || b > 255) {
+            throw new IllegalArgumentException();
+        }
+        if (a < 0 || a > 255) {
+            throw new IllegalArgumentException();
+        }
+        this.red = (short) r;
+        this.green = (short) g;
+        this.blue = (short) b;
+        this.alpha = (short) a;
     }
 
     public java.awt.Color getAWTColor() {

@@ -9,8 +9,8 @@ package com.matrixpeckham.libnoise.util;
 
 import static com.matrixpeckham.libnoise.util.Globals.RASTER_MAX_HEIGHT;
 import static com.matrixpeckham.libnoise.util.Globals.RASTER_MAX_WIDTH;
+import java.awt.image.BufferedImage;
 import static java.lang.System.arraycopy;
-
 
 public class Image {
 
@@ -129,9 +129,8 @@ public class Image {
     public void clear(Color value) {
         if (noiseImage != null) {
             for (int y = 0; y < height; y++) {
-                Color[] pDest = getSlabPtr(0, y);
                 for (int x = 0; x < width; x++) {
-                    pDest[x] = value;
+                    noiseImage[y][x] = value;
                 }
             }
         }
@@ -158,9 +157,8 @@ public class Image {
         setSize(source.width, source.height);
         for (int y = 0; y < source.getHeight();
                 y++) {
-            Color[] pSource = source.getConstSlabPtr(0, y);
-            Color[] pDest = getSlabPtr(0, y);
-            arraycopy(pSource, 0, pDest, 0, pSource.length);
+            arraycopy(source.noiseImage[y], 0, noiseImage[y], 0,
+                    noiseImage[y].length);
         }
         borderValue = source.borderValue;
     }
@@ -189,51 +187,6 @@ public class Image {
     }
 
     /**
-     * Returns a const pointer to a slab.
-     *
-     * @returns A const pointer to a slab at the position (0, 0), or
-     * @a NULL if the noise map is empty.
-     */
-    public Color[] getConstSlabPtr() {
-        return noiseImage[0];
-    }
-
-    /**
-     * Returns a const pointer to a slab at the specified row.
-     *
-     * @param row The row, or @a y coordinate.
-     *
-     * @returns A const pointer to a slab at the position ( 0, @a row ), or @a
-     * NULL if the noise map is empty.
-     *
-     * @pre The coordinates must exist within the bounds of the noise map.
-     *
-     * This method does not perform bounds checking so be careful when calling
-     * it.
-     */
-    public Color[] getConstSlabPtr(int row) {
-        return getConstSlabPtr(0, row);
-    }
-
-    /**
-     * Returns a const pointer to a slab at the specified position.
-     *
-     * @param x The x coordinate of the position.
-     * @param y The y coordinate of the position.
-     *
-     * @returns A const pointer to a slab at the position ( @a x, @a y ), or @a
-     * NULL if the noise map is empty.
-     *
-     * @pre The coordinates must exist within the bounds of the noise map.
-     *
-     * This method does not perform bounds checking so be careful when calling
-     * it.
-     */
-    public Color[] getConstSlabPtr(int x, int y) {
-        return noiseImage[y];
-    }
-
-    /**
      * Returns the height of the noise map.
      *
      * @returns The height of the noise map.
@@ -254,65 +207,6 @@ public class Image {
     }
 
     /**
-     * Returns a pointer to a slab.
-     *
-     * @returns A pointer to a slab at the position (0, 0), or @a NULL if the
-     * noise map is empty.
-     */
-    public Color[] getSlabPtr() {
-        return noiseImage[0];
-    }
-
-    /**
-     * Returns a pointer to a slab at the specified row.
-     *
-     * @param row The row, or @a y coordinate.
-     *
-     * @returns A pointer to a slab at the position ( 0, @a row ), or
-     * @a NULL if the noise map is empty.
-     *
-     * @pre The coordinates must exist within the bounds of the noise map.
-     *
-     * This method does not perform bounds checking so be careful when calling
-     * it.
-     */
-    public Color[] getSlabPtr(int row) {
-        return getSlabPtr(0, row);
-    }
-
-    /**
-     * Returns a pointer to a slab at the specified position.
-     *
-     * @param x The x coordinate of the position.
-     * @param y The y coordinate of the position.
-     *
-     * @returns A pointer to a slab at the position ( @a x, @a y ) or
-     * @a NULL if the noise map is empty.
-     *
-     * @pre The coordinates must exist within the bounds of the noise map.
-     *
-     * This method does not perform bounds checking so be careful when calling
-     * it.
-     */
-    private Color[] getSlabPtr(int x, int y) {
-        return noiseImage[y];
-    }
-
-    /**
-     * Returns the stride amount of the noise map.
-     *
-     * @returns The stride amount of the noise map.
-     *
-     * - The <i>stride amount</i> is the offset between the starting points of
-     * any two adjacent slabs in a noise map. - The stride amount is measured by
-     * the number of @a Color values between these two points, not by the number
-     * of bytes.
-     */
-    public int getStride() {
-        return stride;
-    }
-
-    /**
      * Returns a value from the specified position in the noise map.
      *
      * @param x The x coordinate of the position.
@@ -326,7 +220,7 @@ public class Image {
     public Color getValue(int x, int y) {
         if (noiseImage != null) {
             if (x >= 0 && x < width && y >= 0 && y < height) {
-                return getConstSlabPtr(y)[x];
+                return noiseImage[y][x];
             }
         }
         //the coordinates specified are outside the map, border
@@ -372,7 +266,7 @@ public class Image {
             Color[][] newNoiseImage = new Color[height][width];
             for (int y = 0; y < height;
                     y++) {
-                arraycopy(noiseImage[y], 0, newNoiseImage[0], 0, width);
+                arraycopy(noiseImage[y], 0, newNoiseImage[y], 0, width);
             }
             noiseImage = newNoiseImage;
             memUsed = newMemUsage;
@@ -413,8 +307,8 @@ public class Image {
      * If the @a INVALID_PARAM exception occurs, the noise map is unmodified.
      */
     public void setSize(int width, int height) {
-        if (width < 0 || height < 0 || width > RASTER_MAX_WIDTH ||
-                height > RASTER_MAX_HEIGHT) {
+        if (width < 0 || height < 0 || width > RASTER_MAX_WIDTH || height
+                > RASTER_MAX_HEIGHT) {
             throw new IllegalArgumentException("Bad width or height for map");
         } else if (width == 0 || height == 0) {
             //an empty noise map was specified. delete all and reset
@@ -448,7 +342,7 @@ public class Image {
     public void setValue(int x, int y, Color value) {
         if (noiseImage != null) {
             if (x >= 0 && x < width && y >= 0 && y < height) {
-                getSlabPtr(x, y)[x] = value;
+                noiseImage[y][x] = value;
             }
         }
     }
@@ -472,5 +366,18 @@ public class Image {
         source.initObj();
     }
 
+    public BufferedImage asBufferedImage() {
+        BufferedImage image = new BufferedImage(getWidth(), getHeight(),
+                BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < getHeight(); y++) {
+            for (int x = 0; x < getWidth(); x++) {
+                Color c = getValue(x, y);
+                java.awt.Color awtCol = new java.awt.Color(c.red, c.green,
+                        c.blue, c.alpha);
+                image.setRGB(x, y, awtCol.getRGB());
+            }
+        }
+        return image;
+    }
 
 }

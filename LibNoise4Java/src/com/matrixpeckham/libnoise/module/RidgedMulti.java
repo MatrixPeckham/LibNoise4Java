@@ -14,7 +14,6 @@ import static com.matrixpeckham.libnoise.util.NoiseQuality.STD;
 import static java.lang.Math.abs;
 import static java.lang.Math.pow;
 
-
 public class RidgedMulti extends Module {
 
     /**
@@ -36,7 +35,6 @@ public class RidgedMulti extends Module {
      * default number of octaves for the noise
      */
     public static final int DEFAULT_RIDGED_OCTAVE_COUNT = 6;
-
 
     /**
      * default offset
@@ -73,7 +71,6 @@ public class RidgedMulti extends Module {
      */
     protected double frequency;
 
-
     /**
      * gain value
      */
@@ -99,7 +96,6 @@ public class RidgedMulti extends Module {
      */
     protected double offset;
 
-
     /**
      * seed value used by perlin noise
      */
@@ -119,6 +115,8 @@ public class RidgedMulti extends Module {
         noiseQuality = DEFAULT_RIDGED_QUALITY;
         octaveCount = DEFAULT_RIDGED_OCTAVE_COUNT;
         seed = DEFAULT_RIDGED_SEED;
+        offset = DEFAULT_RIDGED_OFFSET;
+        gain = DEFAULT_RIDGED_GAIN;
         exponent = DEFUALT_RIDGED_EXPONENT;
         spectralWeights = new double[RIDGED_MAX_OCTAVE];
         calcSpectralWeights();
@@ -137,7 +135,7 @@ public class RidgedMulti extends Module {
                 i++) {
             //compute weight for each frequency
             spectralWeights[i] = pow(localFrequency, -h);
-            frequency *= lacunarity;
+            localFrequency *= lacunarity;
         }
     }
 
@@ -145,9 +143,10 @@ public class RidgedMulti extends Module {
      * returns the exponent parameter for calculating the spectral weights
      *
      * @return
-     */    public double getExponent() {
-         return exponent;
-     }
+     */
+    public double getExponent() {
+        return exponent;
+    }
 
     /**
      * frequency of the first octave
@@ -208,7 +207,6 @@ public class RidgedMulti extends Module {
     }
 
     //multifractal code originally written by F. Kenton "Doc Mojo" Musgrave. 1998. Modified by jas for use with libnoise
-
     @Override
     public double getValue(double x, double y, double z) {
         x *= frequency;

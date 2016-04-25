@@ -135,11 +135,10 @@ public class WriterTER {
                             os.write(nullBuff2);
                             for (int y = 0; y < height;
                                     y++) {
-                                double[] pSource = sourceNoiseMap.getSlabPtr(y);
                                 for (int x = 0; x < width;
                                         x++) {
                                     short scaledHeight = (short) floor(
-                                            pSource[x] * 2.0);
+                                            sourceNoiseMap.getValue(x, y) * 2.0);
                                     os.write(getBytes(scaledHeight));
                                 }
                             }

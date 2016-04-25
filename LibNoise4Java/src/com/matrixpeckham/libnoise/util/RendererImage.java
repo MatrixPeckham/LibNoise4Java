@@ -14,7 +14,6 @@ import static com.matrixpeckham.libnoise.util.Globals.linearInterp;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
-
 public class RendererImage {
 
     /**
@@ -75,13 +74,12 @@ public class RendererImage {
     /**
      * The elevation of the light source, in degrees.
      */
-    private final double lightElev;
+    private double lightElev;
 
     /**
      * The intensity of the light source.
      */
     private double lightIntensity;
-
 
     /**
      * Used by the CalcLightIntensity() method to recalculate the light values
@@ -139,8 +137,8 @@ public class RendererImage {
      * Make sure the light source is enabled via a call to the EnableLight()
      * method before calling the Render() method.
      */
-    public void SetLightElev(double lightElev) {
-        lightElev = lightElev;
+    public void setLightElev(double lightElev) {
+        this.lightElev = lightElev;
         recalcLightValues = true;
     }
 
@@ -598,7 +596,7 @@ public class RendererImage {
                 // color.
                 destImage.setValue(x, y, calcDestColor(destColor,
                         backgroundColor,
-                        lightIntensity));
+                        locLightIntensity));
 
             }
         }

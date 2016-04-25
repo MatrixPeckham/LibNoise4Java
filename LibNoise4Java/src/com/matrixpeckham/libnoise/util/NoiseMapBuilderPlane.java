@@ -10,9 +10,7 @@ package com.matrixpeckham.libnoise.util;
 import com.matrixpeckham.libnoise.model.Plane;
 import static com.matrixpeckham.libnoise.util.Globals.linearInterp;
 
-
 public class NoiseMapBuilderPlane extends NoiseMapBuilder {
-
 
     /**
      * A flag specifying whether seamless tiling is enabled.
@@ -65,6 +63,7 @@ public class NoiseMapBuilderPlane extends NoiseMapBuilder {
         destNoiseMap.setSize(destWidth, destHeight);
         // Create the plane model.
         Plane planeModel = new Plane();
+        planeModel.useXY();
         planeModel.setModule(sourceModule);
         double xExtent = upperXBound - lowerXBound;
         double zExtent = upperZBound - lowerZBound;

@@ -411,7 +411,7 @@ public class Globals {
      * @return The maximum of the two values.
      */
     public static <T extends Comparable<? super T>> T getMax(T a, T b) {
-        if (a.compareTo(b) < 0) {
+        if (a.compareTo(b) > 0) {
             return a;
         }
         return b;
@@ -426,7 +426,7 @@ public class Globals {
      * @return The minimum of the two values.
      */
     public static <T extends Comparable<? super T>> T getMin(T a, T b) {
-        if (a.compareTo(b) < 0) {
+        if (a.compareTo(b) > 0) {
             return b;
         }
         return a;
