@@ -18,16 +18,17 @@ import java.util.logging.Logger;
  * This noise module requires one source module.
  *
  */
+//TODO: Should this be a forwarding extender?
 public class Invert extends AbstractModule {
 
     @Override
     public int getSourceModuleCount() {
-        return 1;
+	return 1;
     }
 
     @Override
     public double getValue(double x, double y, double z) {
-        return -sourceModule[0].getValue(x, y, z);
+	return -sourceModule[0].getValue(x, y, z);
     }
 
     private static final Logger LOG = Logger.getLogger(Invert.class.getName());

@@ -32,6 +32,7 @@ import java.util.logging.Logger;
  *
  * @author William Matrix Peckham
  */
+//TODO: Should this be a forwarding extender?
 public class RotatePoint extends AbstractModule {
 
     /**
@@ -113,20 +114,20 @@ public class RotatePoint extends AbstractModule {
      *
      */
     public RotatePoint() {
-        setAngles(DEFAULT_ROTATE_X, DEFAULT_ROTATE_Y, DEFAULT_ROTATE_Z);
+	setAngles(DEFAULT_ROTATE_X, DEFAULT_ROTATE_Y, DEFAULT_ROTATE_Z);
     }
 
     @Override
     public int getSourceModuleCount() {
-        return 1;
+	return 1;
     }
 
     @Override
     public double getValue(double x, double y, double z) {
-        double nx = (x1Matrix * x) + (y1Matrix * y) + (z1Matrix * z);
-        double ny = (x2Matrix * x) + (y2Matrix * y) + (z2Matrix * z);
-        double nz = (x3Matrix * x) + (y3Matrix * y) + (z3Matrix * z);
-        return sourceModule[0].getValue(nx, ny, nz);
+	double nx = (x1Matrix * x) + (y1Matrix * y) + (z1Matrix * z);
+	double ny = (x2Matrix * x) + (y2Matrix * y) + (z2Matrix * z);
+	double nz = (x3Matrix * x) + (y3Matrix * y) + (z3Matrix * z);
+	return sourceModule[0].getValue(nx, ny, nz);
     }
 
     /**
@@ -136,7 +137,7 @@ public class RotatePoint extends AbstractModule {
      * @return The rotation angle around the @a x axis, in degrees.
      */
     public double getXAngle() {
-        return xAngle;
+	return xAngle;
     }
 
     /**
@@ -146,7 +147,7 @@ public class RotatePoint extends AbstractModule {
      * @return The rotation angle around the @a y axis, in degrees.
      */
     public double getYAngle() {
-        return yAngle;
+	return yAngle;
     }
 
     /**
@@ -156,7 +157,7 @@ public class RotatePoint extends AbstractModule {
      * @return The rotation angle around the @a z axis, in degrees.
      */
     public double getZAngle() {
-        return zAngle;
+	return zAngle;
     }
 
     /**
@@ -171,27 +172,27 @@ public class RotatePoint extends AbstractModule {
      * the origin before returning the output value from the source module.
      */
     public final void setAngles(double xAngle, double yAngle, double zAngle) {
-        double xCos, yCos, zCos, xSin, ySin, zSin;
-        xCos = cos(xAngle * DEG_TO_RAD);
-        yCos = cos(yAngle * DEG_TO_RAD);
-        zCos = cos(zAngle * DEG_TO_RAD);
-        xSin = sin(xAngle * DEG_TO_RAD);
-        ySin = sin(yAngle * DEG_TO_RAD);
-        zSin = sin(zAngle * DEG_TO_RAD);
+	double xCos, yCos, zCos, xSin, ySin, zSin;
+	xCos = cos(xAngle * DEG_TO_RAD);
+	yCos = cos(yAngle * DEG_TO_RAD);
+	zCos = cos(zAngle * DEG_TO_RAD);
+	xSin = sin(xAngle * DEG_TO_RAD);
+	ySin = sin(yAngle * DEG_TO_RAD);
+	zSin = sin(zAngle * DEG_TO_RAD);
 
-        x1Matrix = ySin * xSin * zSin + yCos * zCos;
-        y1Matrix = xCos * zSin;
-        z1Matrix = ySin * zCos - yCos * xSin * zSin;
-        x2Matrix = ySin * xSin * zCos - yCos * zSin;
-        y2Matrix = xCos * zCos;
-        z2Matrix = -yCos * xSin * zCos - ySin * zSin;
-        x3Matrix = -ySin * xCos;
-        y3Matrix = xSin;
-        z3Matrix = yCos * xCos;
+	x1Matrix = ySin * xSin * zSin + yCos * zCos;
+	y1Matrix = xCos * zSin;
+	z1Matrix = ySin * zCos - yCos * xSin * zSin;
+	x2Matrix = ySin * xSin * zCos - yCos * zSin;
+	y2Matrix = xCos * zCos;
+	z2Matrix = -yCos * xSin * zCos - ySin * zSin;
+	x3Matrix = -ySin * xCos;
+	y3Matrix = xSin;
+	z3Matrix = yCos * xCos;
 
-        this.xAngle = xAngle;
-        this.yAngle = yAngle;
-        this.zAngle = zAngle;
+	this.xAngle = xAngle;
+	this.yAngle = yAngle;
+	this.zAngle = zAngle;
 
     }
 
@@ -204,7 +205,7 @@ public class RotatePoint extends AbstractModule {
      * the origin before returning the output value from the source module.
      */
     public void setXAngle(double xAngle) {
-        setAngles(xAngle, yAngle, zAngle);
+	setAngles(xAngle, yAngle, zAngle);
     }
 
     /**
@@ -216,7 +217,7 @@ public class RotatePoint extends AbstractModule {
      * the origin before returning the output value from the source module.
      */
     public void setYAngle(double yAngle) {
-        setAngles(xAngle, yAngle, zAngle);
+	setAngles(xAngle, yAngle, zAngle);
     }
 
     /**
@@ -228,10 +229,10 @@ public class RotatePoint extends AbstractModule {
      * the origin before returning the output value from the source module.
      */
     public void setZAngle(double zAngle) {
-        setAngles(xAngle, yAngle, zAngle);
+	setAngles(xAngle, yAngle, zAngle);
     }
 
     private static final Logger LOG
-            = Logger.getLogger(RotatePoint.class.getName());
+	    = Logger.getLogger(RotatePoint.class.getName());
 
 }

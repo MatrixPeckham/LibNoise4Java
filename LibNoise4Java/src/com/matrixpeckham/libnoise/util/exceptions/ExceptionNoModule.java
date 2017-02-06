@@ -15,16 +15,11 @@ import static java.util.logging.Logger.getLogger;
  *
  * Could not retrieve a source module from a noise module.
  *
- * @note If one or more required source modules were not connected to a specific
- * noise module, and its GetValue() method was called, that method will raise a
- * debug assertion instead of this exception. This is done for performance
- * reasons.
- * @author William Matrix Peckham
  */
 public class ExceptionNoModule extends NoiseException {
 
     private static final Logger LOG = getLogger(ExceptionNoModule.class.
-            getName());
+	    getName());
 
     private static final long serialVersionUID = 1L;
 
@@ -32,20 +27,20 @@ public class ExceptionNoModule extends NoiseException {
     }
 
     public ExceptionNoModule(String message) {
-        super(message);
+	super(message);
     }
 
     public ExceptionNoModule(String message, Throwable cause) {
-        super(message, cause);
+	super(message, cause);
     }
 
     public ExceptionNoModule(Throwable cause) {
-        super(cause);
+	super(cause);
     }
 
     public ExceptionNoModule(String message, Throwable cause,
-            boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+	    boolean enableSuppression, boolean writableStackTrace) {
+	super(message, cause, enableSuppression, writableStackTrace);
     }
 
 }

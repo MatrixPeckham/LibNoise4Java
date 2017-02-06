@@ -91,7 +91,7 @@ public final class Image {
      * Creates an empty noise map.
      */
     public Image() {
-        initObj();
+	initObj();
     }
 
     /**
@@ -111,8 +111,8 @@ public final class Image {
      * It is considered an error if the specified dimensions are not positive.
      */
     public Image(int width, int height) {
-        initObj();
-        setSize(width, height);
+	initObj();
+	setSize(width, height);
     }
 
     /**
@@ -121,8 +121,8 @@ public final class Image {
      * @param rhs image to copy
      */
     public Image(Image rhs) {
-        initObj();
-        copyNoiseImage(rhs);
+	initObj();
+	copyNoiseImage(rhs);
     }
 
     /**
@@ -138,7 +138,7 @@ public final class Image {
      * to store the noise map, not by the number of bytes.
      */
     private int calcMinMemUsage(int width, int height) {
-        return calcStride(width) * height;
+	return calcStride(width) * height;
     }
 
     /**
@@ -154,7 +154,7 @@ public final class Image {
      * of bytes.
      */
     private int calcStride(int width) {
-        return width;
+	return width;
     }
 
     /**
@@ -164,13 +164,13 @@ public final class Image {
      * cleared to.
      */
     public void clear(Color value) {
-        if (noiseImage != null) {
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    noiseImage[y][x] = value;
-                }
-            }
-        }
+	if (noiseImage != null) {
+	    for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {
+		    noiseImage[y][x] = value;
+		}
+	    }
+	}
     }
 
     /**
@@ -189,15 +189,15 @@ public final class Image {
      * if you live in the USA.
      */
     private void copyNoiseImage(Image source) {
-        //resize the noise map buffer then copy the source map
-        //buffer to this map buffer
-        setSize(source.width, source.height);
-        for (int y = 0; y < source.getHeight();
-                y++) {
-            arraycopy(source.noiseImage[y], 0, noiseImage[y], 0,
-                    noiseImage[y].length);
-        }
-        borderValue = source.borderValue;
+	//resize the noise map buffer then copy the source map
+	//buffer to this map buffer
+	setSize(source.width, source.height);
+	for (int y = 0; y < source.getHeight();
+		y++) {
+	    arraycopy(source.noiseImage[y], 0, noiseImage[y], 0,
+		    noiseImage[y].length);
+	}
+	borderValue = source.borderValue;
     }
 
     /**
@@ -207,8 +207,8 @@ public final class Image {
      * deletes the buffer in this noise map.
      */
     private void deleteNoiseImageAndReset() {
-        noiseImage = null;
-        initObj();
+	noiseImage = null;
+	initObj();
     }
 
     /**
@@ -220,7 +220,7 @@ public final class Image {
      * known as the <i>border value</i>.
      */
     Color getBorderValue() {
-        return borderValue;
+	return borderValue;
     }
 
     /**
@@ -229,7 +229,7 @@ public final class Image {
      * @return The height of the noise map.
      */
     public int getHeight() {
-        return height;
+	return height;
     }
 
     /**
@@ -240,7 +240,7 @@ public final class Image {
      * This method returns the number of @a Color values allocated.
      */
     public int getMemUsed() {
-        return memUsed;
+	return memUsed;
     }
 
     /**
@@ -255,13 +255,13 @@ public final class Image {
      * the noise map.
      */
     public Color getValue(int x, int y) {
-        if (noiseImage != null) {
-            if (x >= 0 && x < width && y >= 0 && y < height) {
-                return noiseImage[y][x];
-            }
-        }
-        //the coordinates specified are outside the map, border
-        return borderValue;
+	if (noiseImage != null) {
+	    if (x >= 0 && x < width && y >= 0 && y < height) {
+		return noiseImage[y][x];
+	    }
+	}
+	//the coordinates specified are outside the map, border
+	return borderValue;
     }
 
     /**
@@ -270,7 +270,7 @@ public final class Image {
      * @return The width of the noise map.
      */
     public int getWidth() {
-        return width;
+	return width;
     }
 
     /**
@@ -280,12 +280,12 @@ public final class Image {
      * @noise.pre The noise map buffer must not exist.
      */
     private void initObj() {
-        noiseImage = null;
-        height = 0;
-        width = 0;
-        stride = 0;
-        memUsed = 0;
-        borderValue = new Color();
+	noiseImage = null;
+	height = 0;
+	width = 0;
+	stride = 0;
+	memUsed = 0;
+	borderValue = new Color();
     }
 
     /**
@@ -294,16 +294,16 @@ public final class Image {
      * The contents of the noise map is unaffected.
      */
     public void reclaimMem() {
-        int newMemUsage = calcMinMemUsage(width, height);
-        if (memUsed > newMemUsage) {
-            Color[][] newNoiseImage = new Color[height][width];
-            for (int y = 0; y < height;
-                    y++) {
-                arraycopy(noiseImage[y], 0, newNoiseImage[y], 0, width);
-            }
-            noiseImage = newNoiseImage;
-            memUsed = newMemUsage;
-        }
+	int newMemUsage = calcMinMemUsage(width, height);
+	if (memUsed > newMemUsage) {
+	    Color[][] newNoiseImage = new Color[height][width];
+	    for (int y = 0; y < height;
+		    y++) {
+		arraycopy(noiseImage[y], 0, newNoiseImage[y], 0, width);
+	    }
+	    noiseImage = newNoiseImage;
+	    memUsed = newMemUsage;
+	}
     }
 
     /**
@@ -316,7 +316,7 @@ public final class Image {
      * known as the <i>border value</i>.
      */
     public void setBorderValue(Color borderValue) {
-        this.borderValue = borderValue;
+	this.borderValue = borderValue;
     }
 
     /**
@@ -336,26 +336,26 @@ public final class Image {
      *
      */
     public void setSize(int width, int height) {
-        if (width < 0 || height < 0 || width > RASTER_MAX_WIDTH || height
-                > RASTER_MAX_HEIGHT) {
-            throw new IllegalArgumentException("Bad width or height for map");
-        } else if (width == 0 || height == 0) {
-            //an empty noise map was specified. delete all and reset
-            deleteNoiseImageAndReset();
-        } else {
-            //new noise map size was specified. Allocates a new noise buffer
-            //unless the current buffer is large enough for the new noise map
-            //that way we don't reallocate when we don't need to.
-            int newMemUsage = calcMinMemUsage(width, height);
-            if (memUsed < newMemUsage) {
-                deleteNoiseImageAndReset();
-                noiseImage = new Color[height][width];
-                memUsed = newMemUsage;
-            }
-            stride = calcStride(width);
-            this.width = width;
-            this.height = height;
-        }
+	if (width < 0 || height < 0 || width > RASTER_MAX_WIDTH || height
+		> RASTER_MAX_HEIGHT) {
+	    throw new IllegalArgumentException("Bad width or height for map");
+	} else if (width == 0 || height == 0) {
+	    //an empty noise map was specified. delete all and reset
+	    deleteNoiseImageAndReset();
+	} else {
+	    //new noise map size was specified. Allocates a new noise buffer
+	    //unless the current buffer is large enough for the new noise map
+	    //that way we don't reallocate when we don't need to.
+	    int newMemUsage = calcMinMemUsage(width, height);
+	    if (memUsed < newMemUsage) {
+		deleteNoiseImageAndReset();
+		noiseImage = new Color[height][width];
+		memUsed = newMemUsage;
+	    }
+	    stride = calcStride(width);
+	    this.width = width;
+	    this.height = height;
+	}
     }
 
     /**
@@ -369,11 +369,11 @@ public final class Image {
      * is outside the bounds of the noise map.
      */
     public void setValue(int x, int y, Color value) {
-        if (noiseImage != null) {
-            if (x >= 0 && x < width && y >= 0 && y < height) {
-                noiseImage[y][x] = value;
-            }
-        }
+	if (noiseImage != null) {
+	    if (x >= 0 && x < width && y >= 0 && y < height) {
+		noiseImage[y][x] = value;
+	    }
+	}
     }
 
     /**
@@ -386,27 +386,31 @@ public final class Image {
      * This method only moves the buffer pointer so this method is very quick.
      */
     public void takeOwnership(Image source) {
-        //copy the noise and have it reset
-        memUsed = source.memUsed;
-        height = source.height;
-        width = source.width;
-        stride = source.stride;
-        noiseImage = source.noiseImage;
-        source.initObj();
+	//copy the noise and have it reset
+	memUsed = source.memUsed;
+	height = source.height;
+	width = source.width;
+	stride = source.stride;
+	noiseImage = source.noiseImage;
+	source.initObj();
     }
 
+    /**
+     * Generates a java.awt.image.BufferedImage from the current image. Should
+     * be called after values have been generated.
+     *
+     * @return
+     */
     public BufferedImage asBufferedImage() {
-        BufferedImage image = new BufferedImage(getWidth(), getHeight(),
-                BufferedImage.TYPE_INT_ARGB);
-        for (int y = 0; y < getHeight(); y++) {
-            for (int x = 0; x < getWidth(); x++) {
-                Color c = getValue(x, y);
-                java.awt.Color awtCol = new java.awt.Color(c.red, c.green,
-                        c.blue, c.alpha);
-                image.setRGB(x, y, awtCol.getRGB());
-            }
-        }
-        return image;
+	BufferedImage image = new BufferedImage(getWidth(), getHeight(),
+		BufferedImage.TYPE_INT_ARGB);
+	for (int y = 0; y < getHeight(); y++) {
+	    for (int x = 0; x < getWidth(); x++) {
+		Color c = getValue(x, y);
+		image.setRGB(x, y, c.getAWTColor().getRGB());
+	    }
+	}
+	return image;
     }
 
     private static final Logger LOG = Logger.getLogger(Image.class.getName());

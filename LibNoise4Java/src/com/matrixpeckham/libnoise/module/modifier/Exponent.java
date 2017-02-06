@@ -25,6 +25,7 @@ import java.util.logging.Logger;
  *
  * This noise module requires one source module.
  */
+//TODO: Should this be a forwarding extender?
 public class Exponent extends AbstractModule {
 
     /**
@@ -41,7 +42,7 @@ public class Exponent extends AbstractModule {
      * constructor
      */
     public Exponent() {
-        exponent = DEFAULT_EXPONENT;
+	exponent = DEFAULT_EXPONENT;
     }
 
     /**
@@ -56,18 +57,18 @@ public class Exponent extends AbstractModule {
      * re-scales that value back to the original range.
      */
     public double getExponent() {
-        return exponent;
+	return exponent;
     }
 
     @Override
     public int getSourceModuleCount() {
-        return 1;
+	return 1;
     }
 
     @Override
     public double getValue(double x, double y, double z) {
-        double value = sourceModule[0].getValue(x, y, z);
-        return pow(abs((value + 1.0) / 2.0), exponent) * 2.0 - 1.0;
+	double value = sourceModule[0].getValue(x, y, z);
+	return pow(abs((value + 1.0) / 2.0), exponent) * 2.0 - 1.0;
     }
 
     /**
@@ -82,7 +83,7 @@ public class Exponent extends AbstractModule {
      * re-scales that value back to the original range.
      */
     public void setExponent(double exponent) {
-        this.exponent = exponent;
+	this.exponent = exponent;
     }
 
     private static final Logger LOG = Logger.getLogger(Exponent.class.getName());

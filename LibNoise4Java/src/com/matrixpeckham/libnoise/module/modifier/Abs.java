@@ -21,16 +21,17 @@ import java.util.logging.Logger;
  *
  * @author William Matrix Peckham
  */
+//TODO: Should this be a forwarding extender?
 public class Abs extends AbstractModule {
 
     @Override
     public int getSourceModuleCount() {
-        return 1;
+	return 1;
     }
 
     @Override
     public double getValue(double x, double y, double z) {
-        return abs(sourceModule[0].getValue(x, y, z));
+	return abs(sourceModule[0].getValue(x, y, z));
     }
 
     private static final Logger LOG = Logger.getLogger(Abs.class.getName());

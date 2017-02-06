@@ -48,12 +48,17 @@ public class GradientColor {
      */
     List<GradientPoint> gradientPoints;
 
-    /* A color object that is used by a gradient object to store a
-     temporary value.*/
+    /**
+     * A color object that is used by a gradient object to store a temporary
+     * value.
+     */
     Color workingColor = new Color();
 
+    /**
+     * Default constructor no colors
+     */
     public GradientColor() {
-        gradientPoints = new ArrayList<>();
+	gradientPoints = new ArrayList<>();
     }
 
     /**
@@ -69,10 +74,10 @@ public class GradientColor {
      * It does not matter which order these gradient points are added.
      */
     public void addGradientPoint(double gradientPos,
-            Color gradientColor) {
-        //find the insertion point for the new point and insert
-        int insertionPos = findInsertionPos(gradientPos);
-        insertAtPos(insertionPos, gradientPos, gradientColor);
+	    Color gradientColor) {
+	//find the insertion point for the new point and insert
+	int insertionPos = findInsertionPos(gradientPos);
+	insertAtPos(insertionPos, gradientPos, gradientColor);
     }
 
     /**
@@ -81,7 +86,7 @@ public class GradientColor {
      * @noise.post All gradient points from this gradient object are deleted.
      */
     public void clear() {
-        gradientPoints.clear();
+	gradientPoints.clear();
     }
 
     /**
@@ -101,21 +106,21 @@ public class GradientColor {
      * that maps a value to a color requires a sorted gradient-point array.
      */
     private int findInsertionPos(double gradientPos) {
-        int insertionPos;
-        for (insertionPos = 0; insertionPos < gradientPoints.size();
-                insertionPos++) {
-            if (gradientPos < gradientPoints.get(insertionPos).pos) {
-                // We found the array index in which to insert the new gradient point.
-                // Exit now.
-                break;
-            } else if (gradientPos == gradientPoints.get(insertionPos).pos) {
-                // Each gradient point is required to contain a unique gradient
-                // position, so throw an exception.
-                throw new IllegalArgumentException(
-                        "Gradient values must be unique");
-            }
-        }
-        return insertionPos;
+	int insertionPos;
+	for (insertionPos = 0; insertionPos < gradientPoints.size();
+		insertionPos++) {
+	    if (gradientPos < gradientPoints.get(insertionPos).pos) {
+		// We found the array index in which to insert the new gradient point.
+		// Exit now.
+		break;
+	    } else if (gradientPos == gradientPoints.get(insertionPos).pos) {
+		// Each gradient point is required to contain a unique gradient
+		// position, so throw an exception.
+		throw new IllegalArgumentException(
+			"Gradient values must be unique");
+	    }
+	}
+	return insertionPos;
     }
 
     /**
@@ -126,38 +131,38 @@ public class GradientColor {
      * @return The color at that position.
      */
     public Color getColor(double gradientPos) {
-        // Find the first element in the gradient point array that has a gradient
-        // position larger than the gradient position passed to this method.
-        int indexPos;
-        for (indexPos = 0; indexPos < gradientPoints.size(); indexPos++) {
-            if (gradientPos < gradientPoints.get(indexPos).pos) {
-                break;
-            }
-        }
-        // Find the two nearest gradient points so that we can perform linear
-        // interpolation on the color.
-        int index0
-                = clampValue(indexPos - 1, 0, gradientPoints.size()
-                        - 1);
-        int index1 = clampValue(indexPos, 0, gradientPoints.size() - 1);
-        // If some gradient points are missing (which occurs if the gradient
-        // position passed to this method is greater than the largest gradient
-        // position or less than the smallest gradient position in the array), get
-        // the corresponding gradient color of the nearest gradient point and exit
-        // now.
-        if (index0 == index1) {
-            workingColor.setTo(gradientPoints.get(index1).color);
-            return new Color(workingColor);
-        }
-        // Compute the alpha value used for linear interpolation.
-        double input0 = gradientPoints.get(index0).pos;
-        double input1 = gradientPoints.get(index1).pos;
-        double alpha = (gradientPos - input0) / (input1 - input0);
-        // Now perform the linear interpolation given the alpha value.
-        Color color0 = gradientPoints.get(index0).color;
-        Color color1 = gradientPoints.get(index1).color;
-        linearInterpColor(color0, color1, alpha, workingColor);
-        return new Color(workingColor);
+	// Find the first element in the gradient point array that has a gradient
+	// position larger than the gradient position passed to this method.
+	int indexPos;
+	for (indexPos = 0; indexPos < gradientPoints.size(); indexPos++) {
+	    if (gradientPos < gradientPoints.get(indexPos).pos) {
+		break;
+	    }
+	}
+	// Find the two nearest gradient points so that we can perform linear
+	// interpolation on the color.
+	int index0
+		= clampValue(indexPos - 1, 0, gradientPoints.size()
+			- 1);
+	int index1 = clampValue(indexPos, 0, gradientPoints.size() - 1);
+	// If some gradient points are missing (which occurs if the gradient
+	// position passed to this method is greater than the largest gradient
+	// position or less than the smallest gradient position in the array), get
+	// the corresponding gradient color of the nearest gradient point and exit
+	// now.
+	if (index0 == index1) {
+	    workingColor.setTo(gradientPoints.get(index1).color);
+	    return new Color(workingColor);
+	}
+	// Compute the alpha value used for linear interpolation.
+	double input0 = gradientPoints.get(index0).pos;
+	double input1 = gradientPoints.get(index1).pos;
+	double alpha = (gradientPos - input0) / (input1 - input0);
+	// Now perform the linear interpolation given the alpha value.
+	Color color0 = gradientPoints.get(index0).color;
+	Color color1 = gradientPoints.get(index1).color;
+	linearInterpColor(color0, color1, alpha, workingColor);
+	return new Color(workingColor);
     }
 
     /**
@@ -173,7 +178,7 @@ public class GradientColor {
      * calls another method of this object.
      */
     public List<GradientPoint> getGradientPointArray() {
-        return gradientPoints;
+	return gradientPoints;
     }
 
     /**
@@ -182,7 +187,7 @@ public class GradientColor {
      * @return The number of gradient points stored in this object.
      */
     public int getGradientPointCount() {
-        return gradientPoints.size();
+	return gradientPoints.size();
     }
 
     /**
@@ -203,11 +208,11 @@ public class GradientColor {
      * the position in which the order is still preserved.
      */
     private void insertAtPos(int insertionPos, double gradientPos,
-            Color gradientColor) {
-        GradientPoint gp = new GradientPoint();
-        gp.color = gradientColor;
-        gp.pos = gradientPos;
-        gradientPoints.add(insertionPos, gp);
+	    Color gradientColor) {
+	GradientPoint gp = new GradientPoint();
+	gp.color = gradientColor;
+	gp.pos = gradientPos;
+	gradientPoints.add(insertionPos, gp);
     }
 
     /**
@@ -220,19 +225,19 @@ public class GradientColor {
      */
     public static class GradientPoint {
 
-        /**
-         * The position of this gradient point.
-         */
-        public double pos;
+	/**
+	 * The position of this gradient point.
+	 */
+	public double pos;
 
-        /**
-         * The color of this gradient point.
-         */
-        public Color color;
+	/**
+	 * The color of this gradient point.
+	 */
+	public Color color;
 
     }
 
     private static final Logger LOG
-            = Logger.getLogger(GradientColor.class.getName());
+	    = Logger.getLogger(GradientColor.class.getName());
 
 }

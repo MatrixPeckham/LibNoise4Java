@@ -13,13 +13,15 @@ import java.util.logging.Logger;
 /**
  * ForwardModule is a module implementation that holds another module and
  * forwards all calls to it. The purpose of this module is to facilitate wrapper
- * classes.
+ * classes, such as Cache. This module on its own does not add any
+ * functionality.
  *
- * @author William Matrix Peckham Module type that we are going to use.
- * @param <T>
+ * @author William Matrix Peckham
+ * @param <T> Module type that we are going to use.
  */
 public class ForwardModule<T extends Module> implements Module {
 
+    //inner module that we forward to.
     private final T inner;
 
     /**
@@ -28,7 +30,7 @@ public class ForwardModule<T extends Module> implements Module {
      * @param inner
      */
     public ForwardModule(T inner) {
-        this.inner = inner;
+	this.inner = inner;
     }
 
     /**
@@ -36,33 +38,35 @@ public class ForwardModule<T extends Module> implements Module {
      * methods of the subclasses instead of the index based methods of the
      * interface.
      *
+     * Useful mostly for setting parameters like octaves, or constant values.
+     *
      * @return
      */
     public T asT() {
-        return inner;
+	return inner;
     }
 
     @Override
     public Module getSourceModule(int index) {
-        return inner.getSourceModule(index);
+	return inner.getSourceModule(index);
     }
 
     @Override
     public int getSourceModuleCount() {
-        return inner.getSourceModuleCount();
+	return inner.getSourceModuleCount();
     }
 
     @Override
     public double getValue(double x, double y, double z) {
-        return inner.getValue(x, y, z);
+	return inner.getValue(x, y, z);
     }
 
     @Override
     public void setSourceModule(int index, Module source) {
-        inner.setSourceModule(index, source);
+	inner.setSourceModule(index, source);
     }
 
     private static final Logger LOG
-            = Logger.getLogger(ForwardModule.class.getName());
+	    = Logger.getLogger(ForwardModule.class.getName());
 
 }

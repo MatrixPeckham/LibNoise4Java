@@ -199,21 +199,21 @@ public class RendererImage {
      * Constructor.
      */
     public RendererImage() {
-        isLightEnabled = false;
-        isWrapEnabled = false;
-        lightAzimuth = 45;
-        lightBrightness = 1;
-        lightColor = new Color((short) 255, (short) 255, (short) 255,
-                (short) 255);
-        lightContrast = 1;
-        lightElev = 45;
-        lightIntensity = 1;
-        backgroundImage = null;
-        destImage = null;
-        sourceNoiseMap = null;
-        recalcLightValues = true;
-        gradient = new GradientColor();
-        buildGrayscaleGradient();
+	isLightEnabled = false;
+	isWrapEnabled = false;
+	lightAzimuth = 45;
+	lightBrightness = 1;
+	lightColor = new Color((short) 255, (short) 255, (short) 255,
+		(short) 255);
+	lightContrast = 1;
+	lightElev = 45;
+	lightIntensity = 1;
+	backgroundImage = null;
+	destImage = null;
+	sourceNoiseMap = null;
+	recalcLightValues = true;
+	gradient = new GradientColor();
+	buildGrayscaleGradient();
     }
 
     /**
@@ -228,8 +228,8 @@ public class RendererImage {
      * method before calling the Render() method.
      */
     public void setLightElev(double lightElev) {
-        this.lightElev = lightElev;
-        recalcLightValues = true;
+	this.lightElev = lightElev;
+	recalcLightValues = true;
     }
 
     /**
@@ -256,8 +256,8 @@ public class RendererImage {
      * from the corresponding pixel in the background image.
      */
     public void addGradientPoint(double gradientPos,
-            Color gradientColor) {
-        gradient.addGradientPoint(gradientPos, gradientColor);
+	    Color gradientColor) {
+	gradient.addGradientPoint(gradientPos, gradientColor);
     }
 
     /**
@@ -270,11 +270,11 @@ public class RendererImage {
      * to black - 1.0 maps to white
      */
     public final void buildGrayscaleGradient() {
-        clearGradient();
-        gradient.addGradientPoint(-1, new Color((short) 0, (short) 0, (short) 0,
-                (short) 255));
-        gradient.addGradientPoint(1, new Color((short) 255, (short) 255,
-                (short) 255, (short) 255));
+	clearGradient();
+	gradient.addGradientPoint(-1, new Color((short) 0, (short) 0, (short) 0,
+		(short) 255));
+	gradient.addGradientPoint(1, new Color((short) 255, (short) 255,
+		(short) 255, (short) 255));
     }
 
     /**
@@ -288,25 +288,25 @@ public class RendererImage {
      * gradient contains various shades of blue.
      */
     public void buildTerrainGradient() {
-        clearGradient();
-        gradient.addGradientPoint(-1, new Color((short) 0, (short) 0,
-                (short) 128, (short) 255));
-        gradient.addGradientPoint(-0.2, new Color((short) 32, (short) 64,
-                (short) 128, (short) 255));
-        gradient.addGradientPoint(-0.04, new Color((short) 64, (short) 96,
-                (short) 192, (short) 255));
-        gradient.addGradientPoint(-0.02, new Color((short) 192, (short) 192,
-                (short) 128, (short) 255));
-        gradient.addGradientPoint(0.0, new Color((short) 0, (short) 192,
-                (short) 0, (short) 255));
-        gradient.addGradientPoint(0.25, new Color((short) 192, (short) 192,
-                (short) 0, (short) 255));
-        gradient.addGradientPoint(0.5, new Color((short) 160, (short) 96,
-                (short) 64, (short) 255));
-        gradient.addGradientPoint(0.75, new Color((short) 128, (short) 255,
-                (short) 255, (short) 255));
-        gradient.addGradientPoint(1, new Color((short) 255, (short) 255,
-                (short) 255, (short) 255));
+	clearGradient();
+	gradient.addGradientPoint(-1, new Color((short) 0, (short) 0,
+		(short) 128, (short) 255));
+	gradient.addGradientPoint(-0.2, new Color((short) 32, (short) 64,
+		(short) 128, (short) 255));
+	gradient.addGradientPoint(-0.04, new Color((short) 64, (short) 96,
+		(short) 192, (short) 255));
+	gradient.addGradientPoint(-0.02, new Color((short) 192, (short) 192,
+		(short) 128, (short) 255));
+	gradient.addGradientPoint(0.0, new Color((short) 0, (short) 192,
+		(short) 0, (short) 255));
+	gradient.addGradientPoint(0.25, new Color((short) 192, (short) 192,
+		(short) 0, (short) 255));
+	gradient.addGradientPoint(0.5, new Color((short) 160, (short) 96,
+		(short) 64, (short) 255));
+	gradient.addGradientPoint(0.75, new Color((short) 128, (short) 255,
+		(short) 255, (short) 255));
+	gradient.addGradientPoint(1, new Color((short) 255, (short) 255,
+		(short) 255, (short) 255));
     }
 
     /**
@@ -320,44 +320,44 @@ public class RendererImage {
      * @return The destination color.
      */
     private Color calcDestColor(
-            Color sourceColor,
-            Color backgroundColor, double lightValue) {
-        double sourceRed = sourceColor.red / 255.0;
-        double sourceGreen = sourceColor.green / 255.0;
-        double sourceBlue = sourceColor.blue / 255.0;
-        double sourceAlpha = sourceColor.alpha / 255.0;
-        double backgroundRed = backgroundColor.red / 255.0;
-        double backgroundGreen = backgroundColor.green / 255.0;
-        double backgroundBlue = backgroundColor.blue / 255.0;
-        //First blend the source color to the background color using the alpha
-        //of the source color
-        double red = linearInterp(backgroundRed, sourceRed, sourceAlpha);
-        double green = linearInterp(backgroundGreen, sourceGreen, sourceAlpha);
-        double blue = linearInterp(backgroundBlue, sourceBlue, sourceAlpha);
-        if (isLightEnabled) {
-            //calculate light color
-            double lightRed = lightValue * (lightColor.red / 255.0);
-            double lightGreen = lightValue * (lightColor.green / 255.0);
-            double lightBlue = lightValue * (lightColor.blue / 255.0);
-            //apply light color
-            red *= lightRed;
-            green *= lightGreen;
-            blue *= lightBlue;
-        }
-        // Clamp the color channels to the (0..1) range.
-        red = (red < 0.0) ? 0.0 : red;
-        red = (red > 1.0) ? 1.0 : red;
-        green = (green < 0.0) ? 0.0 : green;
-        green = (green > 1.0) ? 1.0 : green;
-        blue = (blue < 0.0) ? 0.0 : blue;
-        blue = (blue > 1.0) ? 1.0 : blue;
-        //rescale color channels back to 0-255
-        Color nColor
-                = new Color((short) (((int) (red * 255.0)) & 0xFF),
-                        (short) (((int) (green * 255.0)) & 0xFF),
-                        (short) (((int) (blue * 255.0)) & 0xFF),
-                        getMax(sourceColor.alpha, backgroundColor.alpha));
-        return nColor;
+	    Color sourceColor,
+	    Color backgroundColor, double lightValue) {
+	double sourceRed = sourceColor.red / 255.0;
+	double sourceGreen = sourceColor.green / 255.0;
+	double sourceBlue = sourceColor.blue / 255.0;
+	double sourceAlpha = sourceColor.alpha / 255.0;
+	double backgroundRed = backgroundColor.red / 255.0;
+	double backgroundGreen = backgroundColor.green / 255.0;
+	double backgroundBlue = backgroundColor.blue / 255.0;
+	//First blend the source color to the background color using the alpha
+	//of the source color
+	double red = linearInterp(backgroundRed, sourceRed, sourceAlpha);
+	double green = linearInterp(backgroundGreen, sourceGreen, sourceAlpha);
+	double blue = linearInterp(backgroundBlue, sourceBlue, sourceAlpha);
+	if (isLightEnabled) {
+	    //calculate light color
+	    double lightRed = lightValue * (lightColor.red / 255.0);
+	    double lightGreen = lightValue * (lightColor.green / 255.0);
+	    double lightBlue = lightValue * (lightColor.blue / 255.0);
+	    //apply light color
+	    red *= lightRed;
+	    green *= lightGreen;
+	    blue *= lightBlue;
+	}
+	// Clamp the color channels to the (0..1) range.
+	red = (red < 0.0) ? 0.0 : red;
+	red = (red > 1.0) ? 1.0 : red;
+	green = (green < 0.0) ? 0.0 : green;
+	green = (green > 1.0) ? 1.0 : green;
+	blue = (blue < 0.0) ? 0.0 : blue;
+	blue = (blue > 1.0) ? 1.0 : blue;
+	//rescale color channels back to 0-255
+	Color nColor
+		= new Color((short) (((int) (red * 255.0)) & 0xFF),
+			(short) (((int) (green * 255.0)) & 0xFF),
+			(short) (((int) (blue * 255.0)) & 0xFF),
+			getMax(sourceColor.alpha, backgroundColor.alpha));
+	return nColor;
     }
 
     /**
@@ -372,30 +372,30 @@ public class RendererImage {
      * These values come directly from the noise map.
      */
     private double calcLightIntensity(double center, double left, double right,
-            double down, double up) {
-        //recalculate the sine and cosine of the various light values if
-        //necessary so it doesn't need to be calculated every call
-        if (recalcLightValues) {
-            cosAzimuth = cos(lightAzimuth * DEG_TO_RAD);
-            sinAzimuth = sin(lightAzimuth * DEG_TO_RAD);
-            cosElev = cos(lightElev * DEG_TO_RAD);
-            sinElev = sin(lightElev * DEG_TO_RAD);
-            recalcLightValues = false;
-        }
-        //light calculations
-        //I may be wrong but this seems to be calculating the dot product of
-        //the light direction and the approximate "normal" of the "height field"
-        //represented by the noise. in future I intend to add analytic normals
-        //to this library and then that will be able to be used instead of this.
-        final double I_MAX = 1;
-        double io = I_MAX * SQRT_2 * sinElev / 2;
-        double ix = (I_MAX - io) * lightContrast * SQRT_2 * cosElev * cosAzimuth;
-        double iy = (I_MAX - io) * lightContrast * SQRT_2 * cosElev * sinAzimuth;
-        double intensity = (ix * (left - right) + iy * (down - up) + io);
-        if (intensity < 0) {
-            intensity = 0;
-        }
-        return intensity;
+	    double down, double up) {
+	//recalculate the sine and cosine of the various light values if
+	//necessary so it doesn't need to be calculated every call
+	if (recalcLightValues) {
+	    cosAzimuth = cos(lightAzimuth * DEG_TO_RAD);
+	    sinAzimuth = sin(lightAzimuth * DEG_TO_RAD);
+	    cosElev = cos(lightElev * DEG_TO_RAD);
+	    sinElev = sin(lightElev * DEG_TO_RAD);
+	    recalcLightValues = false;
+	}
+	//light calculations
+	//I may be wrong but this seems to be calculating the dot product of
+	//the light direction and the approximate "normal" of the "height field"
+	//represented by the noise. in future I intend to add analytic normals
+	//to this library and then that will be able to be used instead of this.
+	final double I_MAX = 1;
+	double io = I_MAX * SQRT_2 * sinElev / 2;
+	double ix = (I_MAX - io) * lightContrast * SQRT_2 * cosElev * cosAzimuth;
+	double iy = (I_MAX - io) * lightContrast * SQRT_2 * cosElev * sinAzimuth;
+	double intensity = (ix * (left - right) + iy * (down - up) + io);
+	if (intensity < 0) {
+	    intensity = 0;
+	}
+	return intensity;
     }
 
     /**
@@ -405,7 +405,7 @@ public class RendererImage {
      * color gradient with at least two gradient points.
      */
     public void clearGradient() {
-        gradient.clear();
+	gradient.clear();
     }
 
     /**
@@ -417,11 +417,14 @@ public class RendererImage {
      * as a bump map.
      */
     public void enableLight(boolean enable) {
-        isLightEnabled = enable;
+	isLightEnabled = enable;
     }
 
+    /**
+     * convenience for enableLight(true)
+     */
     public void enableLight() {
-        enableLight(true);
+	enableLight(true);
     }
 
     /**
@@ -440,11 +443,14 @@ public class RendererImage {
      * tileable textures.
      */
     public void enableWrap(boolean enable) {
-        isWrapEnabled = enable;
+	isWrapEnabled = enable;
     }
 
+    /**
+     * convenience for enableWrap(true)
+     */
     public void enableWrap() {
-        enableWrap(true);
+	enableWrap(true);
     }
 
     /**
@@ -457,7 +463,7 @@ public class RendererImage {
      * 270.0 degrees is south.
      */
     public double getLightAzimuth() {
-        return lightAzimuth;
+	return lightAzimuth;
     }
 
     /**
@@ -466,7 +472,7 @@ public class RendererImage {
      * @return The brightness of the light source.
      */
     public double getLightBrightness() {
-        return lightBrightness;
+	return lightBrightness;
     }
 
     /**
@@ -475,7 +481,7 @@ public class RendererImage {
      * @return The color of the light source.
      */
     public Color getLightColor() {
-        return lightColor;
+	return lightColor;
     }
 
     /**
@@ -493,7 +499,7 @@ public class RendererImage {
      * resolution of 1 meter, a good contrast amount to use is ( 1.0 / @a h ).
      */
     public double getLightContrast() {
-        return lightContrast;
+	return lightContrast;
     }
 
     /**
@@ -505,7 +511,7 @@ public class RendererImage {
      * horizon. - 90 degrees is straight up.
      */
     public double getLightElev() {
-        return lightElev;
+	return lightElev;
     }
 
     /**
@@ -514,7 +520,7 @@ public class RendererImage {
      * @return The intensity of the light source.
      */
     public double getLightIntensity() {
-        return lightIntensity;
+	return lightIntensity;
     }
 
     /**
@@ -524,7 +530,7 @@ public class RendererImage {
      * source is disabled.
      */
     boolean isLightEnabled() {
-        return isLightEnabled;
+	return isLightEnabled;
     }
 
     /**
@@ -544,7 +550,7 @@ public class RendererImage {
      * tileable textures
      */
     boolean isWrapEnabled() {
-        return isWrapEnabled;
+	return isWrapEnabled;
     }
 
     /**
@@ -567,128 +573,128 @@ public class RendererImage {
      * blended into the background image.
      */
     public void render() {
-        if (sourceNoiseMap == null
-                || destImage == null
-                || sourceNoiseMap.getWidth() <= 0
-                || sourceNoiseMap.getHeight() <= 0
-                || gradient.getGradientPointCount() < 2) {
-            throw new IllegalArgumentException();
-        }
+	if (sourceNoiseMap == null
+		|| destImage == null
+		|| sourceNoiseMap.getWidth() <= 0
+		|| sourceNoiseMap.getHeight() <= 0
+		|| gradient.getGradientPointCount() < 2) {
+	    throw new IllegalArgumentException();
+	}
 
-        int width = sourceNoiseMap.getWidth();
-        int height = sourceNoiseMap.getHeight();
+	int width = sourceNoiseMap.getWidth();
+	int height = sourceNoiseMap.getHeight();
 
-        // If a background image was provided, make sure it is the same size the
-        // source noise map.
-        if (backgroundImage != null) {
-            if (backgroundImage.getWidth() != width
-                    || backgroundImage.getHeight() != height) {
-                throw new IllegalArgumentException();
-            }
-        }
+	// If a background image was provided, make sure it is the same size the
+	// source noise map.
+	if (backgroundImage != null) {
+	    if (backgroundImage.getWidth() != width
+		    || backgroundImage.getHeight() != height) {
+		throw new IllegalArgumentException();
+	    }
+	}
 
-        // Create the destination image.  It is safe to reuse it if this is also the
-        // background image.
-        if (destImage != backgroundImage) {
-            destImage.setSize(width, height);
-        }
+	// Create the destination image.  It is safe to reuse it if this is also the
+	// background image.
+	if (destImage != backgroundImage) {
+	    destImage.setSize(width, height);
+	}
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
+	for (int y = 0; y < height; y++) {
+	    for (int x = 0; x < width; x++) {
 
-                // Get the color based on the value at the current point in the noise
-                // map.
-                Color destColor = gradient.getColor(sourceNoiseMap.
-                        getValue(x, y));
+		// Get the color based on the value at the current point in the noise
+		// map.
+		Color destColor = gradient.getColor(sourceNoiseMap.
+			getValue(x, y));
 
-                // If lighting is enabled, calculate the light intensity based on the
-                // rate of change at the current point in the noise map.
-                double locLightIntensity;
-                if (isLightEnabled) {
+		// If lighting is enabled, calculate the light intensity based on the
+		// rate of change at the current point in the noise map.
+		double locLightIntensity;
+		if (isLightEnabled) {
 
-                    // Calculate the positions of the current point's four-neighbors.
-                    int xLeftOffset, xRightOffset;
-                    int yUpOffset, yDownOffset;
-                    if (isWrapEnabled) {
-                        if (x == 0) {
-                            xLeftOffset = width - 1;
-                            xRightOffset = 1;
-                        } else if (x == width - 1) {
-                            xLeftOffset = -1;
-                            xRightOffset = -(width - 1);
-                        } else {
-                            xLeftOffset = -1;
-                            xRightOffset = 1;
-                        }
-                        if (y == 0) {
-                            yDownOffset = height - 1;
-                            yUpOffset = 1;
+		    // Calculate the positions of the current point's four-neighbors.
+		    int xLeftOffset, xRightOffset;
+		    int yUpOffset, yDownOffset;
+		    if (isWrapEnabled) {
+			if (x == 0) {
+			    xLeftOffset = width - 1;
+			    xRightOffset = 1;
+			} else if (x == width - 1) {
+			    xLeftOffset = -1;
+			    xRightOffset = -(width - 1);
+			} else {
+			    xLeftOffset = -1;
+			    xRightOffset = 1;
+			}
+			if (y == 0) {
+			    yDownOffset = height - 1;
+			    yUpOffset = 1;
 
-                        } else if (y == height - 1) {
-                            yDownOffset = -1;
-                            yUpOffset = -(height - 1);
-                        } else {
-                            yDownOffset = -1;
-                            yUpOffset = 1;
-                        }
-                    } else {
-                        if (x == 0) {
-                            xLeftOffset = 0;
-                            xRightOffset = 1;
-                        } else if (x == width - 1) {
-                            xLeftOffset = -1;
-                            xRightOffset = 0;
-                        } else {
-                            xLeftOffset = -1;
-                            xRightOffset = 1;
-                        }
-                        if (y == 0) {
-                            yDownOffset = 0;
-                            yUpOffset = 1;
+			} else if (y == height - 1) {
+			    yDownOffset = -1;
+			    yUpOffset = -(height - 1);
+			} else {
+			    yDownOffset = -1;
+			    yUpOffset = 1;
+			}
+		    } else {
+			if (x == 0) {
+			    xLeftOffset = 0;
+			    xRightOffset = 1;
+			} else if (x == width - 1) {
+			    xLeftOffset = -1;
+			    xRightOffset = 0;
+			} else {
+			    xLeftOffset = -1;
+			    xRightOffset = 1;
+			}
+			if (y == 0) {
+			    yDownOffset = 0;
+			    yUpOffset = 1;
 
-                        } else if (y == height - 1) {
-                            yDownOffset = -1;
-                            yUpOffset = 0;
-                        } else {
-                            yDownOffset = -1;
-                            yUpOffset = 1;
-                        }
-                    }
+			} else if (y == height - 1) {
+			    yDownOffset = -1;
+			    yUpOffset = 0;
+			} else {
+			    yDownOffset = -1;
+			    yUpOffset = 1;
+			}
+		    }
 
-                    // Get the noise value of the current point in the source noise map
-                    // and the noise values of its four-neighbors.
-                    double nc = sourceNoiseMap.getValue(x, y);
-                    double nl = sourceNoiseMap.getValue(x + xLeftOffset, y);
-                    double nr = sourceNoiseMap.getValue(x + xRightOffset, y);
-                    double nd = sourceNoiseMap.getValue(x, y + yDownOffset);
-                    double nu = sourceNoiseMap.getValue(x, y + yUpOffset);
+		    // Get the noise value of the current point in the source noise map
+		    // and the noise values of its four-neighbors.
+		    double nc = sourceNoiseMap.getValue(x, y);
+		    double nl = sourceNoiseMap.getValue(x + xLeftOffset, y);
+		    double nr = sourceNoiseMap.getValue(x + xRightOffset, y);
+		    double nd = sourceNoiseMap.getValue(x, y + yDownOffset);
+		    double nu = sourceNoiseMap.getValue(x, y + yUpOffset);
 
-                    // Now we can calculate the lighting intensity.
-                    locLightIntensity = calcLightIntensity(nc, nl, nr, nd, nu);
-                    locLightIntensity *= lightBrightness;
+		    // Now we can calculate the lighting intensity.
+		    locLightIntensity = calcLightIntensity(nc, nl, nr, nd, nu);
+		    locLightIntensity *= lightBrightness;
 
-                } else {
+		} else {
 
-                    // These values will apply no lighting to the destination image.
-                    locLightIntensity = 1.0;
-                }
+		    // These values will apply no lighting to the destination image.
+		    locLightIntensity = 1.0;
+		}
 
-                // Get the current background color from the background image.
-                Color backgroundColor = new Color((short) 255, (short) 255,
-                        (short) 255, (short) 255);
-                if (backgroundImage != null) {
-                    backgroundColor = backgroundImage.getValue(x, y);
-                }
+		// Get the current background color from the background image.
+		Color backgroundColor = new Color((short) 255, (short) 255,
+			(short) 255, (short) 255);
+		if (backgroundImage != null) {
+		    backgroundColor = backgroundImage.getValue(x, y);
+		}
 
-                // Blend the destination color, background color, and the light
-                // intensity together, then update the destination image with that
-                // color.
-                destImage.setValue(x, y, calcDestColor(destColor,
-                        backgroundColor,
-                        locLightIntensity));
+		// Blend the destination color, background color, and the light
+		// intensity together, then update the destination image with that
+		// color.
+		destImage.setValue(x, y, calcDestColor(destColor,
+			backgroundColor,
+			locLightIntensity));
 
-            }
-        }
+	    }
+	}
     }
 
     /**
@@ -705,8 +711,8 @@ public class RendererImage {
      * unless another image replaces that image.
      */
     public void setBackgroundImage(
-            Image backgroundImage) {
-        this.backgroundImage = backgroundImage;
+	    Image backgroundImage) {
+	this.backgroundImage = backgroundImage;
     }
 
     /**
@@ -721,7 +727,7 @@ public class RendererImage {
      * unless another image replaces that image.
      */
     public void setDestImage(Image destImage) {
-        this.destImage = destImage;
+	this.destImage = destImage;
     }
 
     /**
@@ -737,8 +743,8 @@ public class RendererImage {
      * method before calling the Render() method.
      */
     public void setLightAzimuth(double lightAzimuth) {
-        this.lightAzimuth = lightAzimuth;
-        recalcLightValues = true;
+	this.lightAzimuth = lightAzimuth;
+	recalcLightValues = true;
     }
 
     /**
@@ -750,8 +756,8 @@ public class RendererImage {
      * method before calling the Render() method.
      */
     public void setLightBrightness(double lightBrightness) {
-        this.lightBrightness = lightBrightness;
-        recalcLightValues = true;
+	this.lightBrightness = lightBrightness;
+	recalcLightValues = true;
     }
 
     /**
@@ -763,7 +769,7 @@ public class RendererImage {
      * method before calling the Render() method.
      */
     public void setLightColor(Color lightColor) {
-        this.lightColor = lightColor;
+	this.lightColor = lightColor;
     }
 
     /**
@@ -788,12 +794,12 @@ public class RendererImage {
      * method before calling the Render() method.
      */
     public void setLightContrast(double lightContrast) {
-        if (lightContrast <= 0.0) {
-            throw new IllegalArgumentException();
-        }
+	if (lightContrast <= 0.0) {
+	    throw new IllegalArgumentException();
+	}
 
-        this.lightContrast = lightContrast;
-        recalcLightValues = true;
+	this.lightContrast = lightContrast;
+	recalcLightValues = true;
     }
 
     /**
@@ -802,12 +808,12 @@ public class RendererImage {
      * @param lightIntensity
      */
     public void setLightIntensity(double lightIntensity) {
-        if (lightIntensity < 0.0) {
-            throw new IllegalArgumentException();
-        }
+	if (lightIntensity < 0.0) {
+	    throw new IllegalArgumentException();
+	}
 
-        this.lightIntensity = lightIntensity;
-        recalcLightValues = true;
+	this.lightIntensity = lightIntensity;
+	recalcLightValues = true;
     }
 
     /**
@@ -819,11 +825,11 @@ public class RendererImage {
      * unless another image replaces that image.
      */
     public void setSourceNoiseMap(
-            NoiseMap sourceNoiseMap) {
-        this.sourceNoiseMap = sourceNoiseMap;
+	    NoiseMap sourceNoiseMap) {
+	this.sourceNoiseMap = sourceNoiseMap;
     }
 
     private static final Logger LOG
-            = Logger.getLogger(RendererImage.class.getName());
+	    = Logger.getLogger(RendererImage.class.getName());
 
 };

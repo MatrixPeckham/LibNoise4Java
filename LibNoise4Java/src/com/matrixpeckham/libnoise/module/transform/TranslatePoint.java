@@ -25,6 +25,7 @@ import java.util.logging.Logger;
  *
  * This noise module requires one source module.
  */
+//TODO: Should this also be a forwarding extender?
 public class TranslatePoint extends AbstractModule {
 
     /**
@@ -61,20 +62,20 @@ public class TranslatePoint extends AbstractModule {
      * Default Constructor.
      */
     public TranslatePoint() {
-        xTranslation = DEFAULT_TRANSLATE_POINT_X;
-        yTranslation = DEFAULT_TRANSLATE_POINT_Y;
-        zTranslation = DEFAULT_TRANSLATE_POINT_Z;
+	xTranslation = DEFAULT_TRANSLATE_POINT_X;
+	yTranslation = DEFAULT_TRANSLATE_POINT_Y;
+	zTranslation = DEFAULT_TRANSLATE_POINT_Z;
     }
 
     @Override
     public int getSourceModuleCount() {
-        return 1;
+	return 1;
     }
 
     @Override
     public double getValue(double x, double y, double z) {
-        return sourceModule[0].getValue(x + xTranslation, y + yTranslation, z
-                + zTranslation);
+	return sourceModule[0].getValue(x + xTranslation, y + yTranslation, z
+		+ zTranslation);
     }
 
     /**
@@ -83,7 +84,7 @@ public class TranslatePoint extends AbstractModule {
      * @return
      */
     public double getxTranslation() {
-        return xTranslation;
+	return xTranslation;
     }
 
     /**
@@ -92,7 +93,7 @@ public class TranslatePoint extends AbstractModule {
      * @return
      */
     public double getyTranslation() {
-        return yTranslation;
+	return yTranslation;
     }
 
     /**
@@ -101,7 +102,7 @@ public class TranslatePoint extends AbstractModule {
      * @return
      */
     public double getzTranslation() {
-        return zTranslation;
+	return zTranslation;
     }
 
     /**
@@ -114,9 +115,9 @@ public class TranslatePoint extends AbstractModule {
      * from the source module
      */
     public void setTranslation(double translation) {
-        xTranslation = translation;
-        yTranslation = translation;
-        zTranslation = translation;
+	xTranslation = translation;
+	yTranslation = translation;
+	zTranslation = translation;
     }
 
     /**
@@ -132,9 +133,9 @@ public class TranslatePoint extends AbstractModule {
      * from the source module
      */
     public void setTranslation(double x, double y, double z) {
-        xTranslation = x;
-        yTranslation = y;
-        zTranslation = z;
+	xTranslation = x;
+	yTranslation = y;
+	zTranslation = z;
     }
 
     /**
@@ -143,7 +144,7 @@ public class TranslatePoint extends AbstractModule {
      * @param xTranslation
      */
     public void setxTranslation(double xTranslation) {
-        this.xTranslation = xTranslation;
+	this.xTranslation = xTranslation;
     }
 
     /**
@@ -152,7 +153,7 @@ public class TranslatePoint extends AbstractModule {
      * @param yTranslation
      */
     public void setyTranslation(double yTranslation) {
-        this.yTranslation = yTranslation;
+	this.yTranslation = yTranslation;
     }
 
     /**
@@ -161,10 +162,10 @@ public class TranslatePoint extends AbstractModule {
      * @param zTranslation
      */
     public void setzTranslation(double zTranslation) {
-        this.zTranslation = zTranslation;
+	this.zTranslation = zTranslation;
     }
 
     private static final Logger LOG
-            = Logger.getLogger(TranslatePoint.class.getName());
+	    = Logger.getLogger(TranslatePoint.class.getName());
 
 }

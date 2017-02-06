@@ -65,13 +65,14 @@ import java.util.logging.Logger;
  *
  * This noise module requires one source module.
  */
+//TODO: Should this be a forwarding extender?
 public class Turbulence extends AbstractModule {
 
     /**
      * default frequency for turbulence
      */
     public static final double DEFAULT_TURBULENCE_FREQUENCY
-            = DEFAULT_PERLIN_FREQUENCY;
+	    = DEFAULT_PERLIN_FREQUENCY;
 
     /**
      * Default power for turbulence
@@ -112,13 +113,13 @@ public class Turbulence extends AbstractModule {
      * constructor
      */
     public Turbulence() {
-        xDistortionModule = new Perlin();
-        yDistortionModule = new Perlin();
-        zDistortionModule = new Perlin();
-        power = DEFAULT_TURBULENCE_POWER;
-        setSeed(DEFAULT_TURBULENCE_SEED);
-        setFrequency(DEFAULT_TURBULENCE_FREQUENCY);
-        setRoughness(DEFAULT_TURBULENCE_ROUGHNESS);
+	xDistortionModule = new Perlin();
+	yDistortionModule = new Perlin();
+	zDistortionModule = new Perlin();
+	power = DEFAULT_TURBULENCE_POWER;
+	setSeed(DEFAULT_TURBULENCE_SEED);
+	setFrequency(DEFAULT_TURBULENCE_FREQUENCY);
+	setRoughness(DEFAULT_TURBULENCE_ROUGHNESS);
     }
 
     /**
@@ -128,7 +129,7 @@ public class Turbulence extends AbstractModule {
      * displacement amount changes
      */
     public double getFrequency() {
-        return xDistortionModule.getFrequency();
+	return xDistortionModule.getFrequency();
     }
 
     /**
@@ -137,7 +138,7 @@ public class Turbulence extends AbstractModule {
      * @return scaling factor applied to the displacement amount
      */
     public double getPower() {
-        return power;
+	return power;
     }
 
     /**
@@ -146,12 +147,12 @@ public class Turbulence extends AbstractModule {
      * @return
      */
     public int getSeed() {
-        return xDistortionModule.getSeed();
+	return xDistortionModule.getSeed();
     }
 
     @Override
     public int getSourceModuleCount() {
-        return 1;
+	return 1;
     }
 
     /**
@@ -165,40 +166,40 @@ public class Turbulence extends AbstractModule {
      * "kinky" changes
      */
     public int getTurbulence() {
-        return xDistortionModule.getOctaveCount();
+	return xDistortionModule.getOctaveCount();
     }
 
     @Override
     public double getValue(double x, double y, double z) {
-        // Get the values from the three noise::module::Perlin noise modules and
-        // add each value to each coordinate of the input value.  There are also
-        // some offsets added to the coordinates of the input values.  This prevents
-        // the distortion modules from returning zero if the (x, y, z) coordinates,
-        // when multiplied by the frequency, are near an integer boundary.  This is
-        // due to a property of gradient coherent noise, which returns zero at
-        // integer boundaries.
-        double x0, y0, z0;
-        double x1, y1, z1;
-        double x2, y2, z2;
-        x0 = x + (12414.0 / 65536.0);
-        y0 = y + (65124.0 / 65536.0);
-        z0 = z + (31337.0 / 65536.0);
-        x1 = x + (26519.0 / 65536.0);
-        y1 = y + (18128.0 / 65536.0);
-        z1 = z + (60493.0 / 65536.0);
-        x2 = x + (53820.0 / 65536.0);
-        y2 = y + (11213.0 / 65536.0);
-        z2 = z + (44845.0 / 65536.0);
-        double xDistort = x + (xDistortionModule.getValue(x0, y0, z0)
-                * power);
-        double yDistort = y + (yDistortionModule.getValue(x1, y1, z1)
-                * power);
-        double zDistort = z + (zDistortionModule.getValue(x2, y2, z2)
-                * power);
+	// Get the values from the three noise::module::Perlin noise modules and
+	// add each value to each coordinate of the input value.  There are also
+	// some offsets added to the coordinates of the input values.  This prevents
+	// the distortion modules from returning zero if the (x, y, z) coordinates,
+	// when multiplied by the frequency, are near an integer boundary.  This is
+	// due to a property of gradient coherent noise, which returns zero at
+	// integer boundaries.
+	double x0, y0, z0;
+	double x1, y1, z1;
+	double x2, y2, z2;
+	x0 = x + (12414.0 / 65536.0);
+	y0 = y + (65124.0 / 65536.0);
+	z0 = z + (31337.0 / 65536.0);
+	x1 = x + (26519.0 / 65536.0);
+	y1 = y + (18128.0 / 65536.0);
+	z1 = z + (60493.0 / 65536.0);
+	x2 = x + (53820.0 / 65536.0);
+	y2 = y + (11213.0 / 65536.0);
+	z2 = z + (44845.0 / 65536.0);
+	double xDistort = x + (xDistortionModule.getValue(x0, y0, z0)
+		* power);
+	double yDistort = y + (yDistortionModule.getValue(x1, y1, z1)
+		* power);
+	double zDistort = z + (zDistortionModule.getValue(x2, y2, z2)
+		* power);
 
-        // Retrieve the output value at the offsetted input value instead of the
-        // original input value.
-        return sourceModule[0].getValue(xDistort, yDistort, zDistort);
+	// Retrieve the output value at the offsetted input value instead of the
+	// original input value.
+	return sourceModule[0].getValue(xDistort, yDistort, zDistort);
     }
 
     /**
@@ -210,9 +211,9 @@ public class Turbulence extends AbstractModule {
      * amount changes.
      */
     public final void setFrequency(double frequency) {
-        xDistortionModule.setFrequency(frequency);
-        yDistortionModule.setFrequency(frequency);
-        zDistortionModule.setFrequency(frequency);
+	xDistortionModule.setFrequency(frequency);
+	yDistortionModule.setFrequency(frequency);
+	zDistortionModule.setFrequency(frequency);
     }
 
     /**
@@ -224,7 +225,7 @@ public class Turbulence extends AbstractModule {
      * displacement amount
      */
     public void setPower(double power) {
-        this.power = power;
+	this.power = power;
     }
 
     /**
@@ -243,10 +244,10 @@ public class Turbulence extends AbstractModule {
      * octaves used by the noise::module::Perlin noise modules.
      */
     public final void setRoughness(int roughness) {
-        //sets the octave count for the roughness
-        xDistortionModule.setOctaveCount(roughness);
-        yDistortionModule.setOctaveCount(roughness);
-        zDistortionModule.setOctaveCount(roughness);
+	//sets the octave count for the roughness
+	xDistortionModule.setOctaveCount(roughness);
+	yDistortionModule.setOctaveCount(roughness);
+	zDistortionModule.setOctaveCount(roughness);
     }
 
     /**
@@ -267,14 +268,14 @@ public class Turbulence extends AbstractModule {
      * - It assigns the seed value (@a seed + 2) to the @a z noise module.
      */
     public final void setSeed(int seed) {
-        //set the seed of each nosie value. to prevent
-        //artifacts we use a different seed for each noise
-        xDistortionModule.setSeed(seed);
-        yDistortionModule.setSeed(seed + 1);
-        zDistortionModule.setSeed(seed + 2);
+	//set the seed of each nosie value. to prevent
+	//artifacts we use a different seed for each noise
+	xDistortionModule.setSeed(seed);
+	yDistortionModule.setSeed(seed + 1);
+	zDistortionModule.setSeed(seed + 2);
     }
 
     private static final Logger LOG
-            = Logger.getLogger(Turbulence.class.getName());
+	    = Logger.getLogger(Turbulence.class.getName());
 
 }
