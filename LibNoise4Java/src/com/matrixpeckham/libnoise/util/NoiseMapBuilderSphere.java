@@ -8,10 +8,28 @@
 package com.matrixpeckham.libnoise.util;
 
 import com.matrixpeckham.libnoise.model.Sphere;
+import java.util.logging.Logger;
 
-
+/**
+ * Builds a spherical noise map.
+ *
+ * This class builds a noise map by filling it with coherent-noise values
+ * generated from the surface of a sphere.
+ *
+ * This class describes these input values using a (latitude, longitude)
+ * coordinate system. After generating the coherent-noise value from the input
+ * value, it then "flattens" these coordinates onto a plane so that it can write
+ * the values into a two-dimensional noise map.
+ *
+ * The sphere model has a radius of 1.0 unit. Its center is at the origin.
+ *
+ * The x coordinate in the noise map represents the longitude. The y coordinate
+ * in the noise map represents the latitude.
+ *
+ * The application must provide the southern, northern, western, and eastern
+ * bounds of the noise map, in degrees.
+ */
 public class NoiseMapBuilderSphere extends NoiseMapBuilder {
-
 
     /**
      * Eastern boundary of the spherical noise map, in degrees.
@@ -63,11 +81,10 @@ public class NoiseMapBuilderSphere extends NoiseMapBuilder {
         double latExtent = northLatBound - southLatBound;
         double xDelta = lonExtent / destWidth;
         double yDelta = latExtent / destHeight;
-        double curLon = westLonBound;
         double curLat = southLatBound;
         // Fill every point in the noise map with the output values from the model.
         for (int y = 0; y < destHeight; y++) {
-            curLon = westLonBound;
+            double curLon = westLonBound;
             for (int x = 0; x < destWidth; x++) {
                 float curValue = (float) sphereModel.getValue(curLat, curLon);
                 destNoiseMap.setValue(x, y, curValue);
@@ -83,7 +100,7 @@ public class NoiseMapBuilderSphere extends NoiseMapBuilder {
     /**
      * Returns the eastern boundary of the spherical noise map.
      *
-     * @returns The eastern boundary of the noise map, in degrees.
+     * @return The eastern boundary of the noise map, in degrees.
      */
     public double getEastLonBound() {
         return eastLonBound;
@@ -92,7 +109,7 @@ public class NoiseMapBuilderSphere extends NoiseMapBuilder {
     /**
      * Returns the northern boundary of the spherical noise map
      *
-     * @returns The northern boundary of the noise map, in degrees.
+     * @return The northern boundary of the noise map, in degrees.
      */
     public double getNorthLatBound() {
         return northLatBound;
@@ -101,7 +118,7 @@ public class NoiseMapBuilderSphere extends NoiseMapBuilder {
     /**
      * Returns the southern boundary of the spherical noise map
      *
-     * @returns The southern boundary of the noise map, in degrees.
+     * @return The southern boundary of the noise map, in degrees.
      */
     public double getSouthLatBound() {
         return southLatBound;
@@ -110,7 +127,7 @@ public class NoiseMapBuilderSphere extends NoiseMapBuilder {
     /**
      * Returns the western boundary of the spherical noise map
      *
-     * @returns The western boundary of the noise map, in degrees.
+     * @return The western boundary of the noise map, in degrees.
      */
     public double getWestLonBound() {
         return westLonBound;
@@ -124,10 +141,10 @@ public class NoiseMapBuilderSphere extends NoiseMapBuilder {
      * @param westLonBound The western boundary of the noise map, in degrees.
      * @param eastLonBound The eastern boundary of the noise map, in degrees.
      *
-     * @pre The southern boundary is less than the northern boundary.
-     * @pre The western boundary is less than the eastern boundary.
+     * @noise.pre The southern boundary is less than the northern boundary.
+     * @noise.pre The western boundary is less than the eastern boundary.
      *
-     * @throw noise::ExceptionInvalidParam See the preconditions.
+     * @throws IllegalArgumentException See the preconditions.
      */
     public void setBounds(double southLatBound, double northLatBound,
             double westLonBound, double eastLonBound) {
@@ -141,5 +158,8 @@ public class NoiseMapBuilderSphere extends NoiseMapBuilder {
         this.westLonBound = westLonBound;
         this.eastLonBound = eastLonBound;
     }
+
+    private static final Logger LOG
+            = Logger.getLogger(NoiseMapBuilderSphere.class.getName());
 
 };

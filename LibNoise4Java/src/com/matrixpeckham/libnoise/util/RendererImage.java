@@ -13,7 +13,97 @@ import static com.matrixpeckham.libnoise.util.Globals.getMax;
 import static com.matrixpeckham.libnoise.util.Globals.linearInterp;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import java.util.logging.Logger;
 
+/**
+ * Renders an image from a noise map.
+ *
+ * This class renders an image given the contents of a noise-map object.
+ *
+ * An application can configure the output of the image in three ways: - Specify
+ * the color gradient. - Specify the light source parameters. - Specify the
+ * background image.
+ *
+ * <b>Specify the color gradient</b>
+ *
+ * This class uses a color gradient to calculate the color for each pixel in the
+ * destination image according to the value from the corresponding position in
+ * the noise map.
+ *
+ * A color gradient is a list of gradually-changing colors. A color gradient is
+ * defined by a list of <i>gradient points</i>. Each gradient point has a
+ * position and a color. In a color gradient, the colors between two adjacent
+ * gradient points are linearly interpolated.
+ *
+ * For example, suppose this class contains the following color gradient:
+ *
+ * - -1.0 maps to dark blue. - -0.2 maps to light blue. - -0.1 maps to tan. -
+ * 0.0 maps to green. - 1.0 maps to white.
+ *
+ * The value 0.5 maps to a greenish-white color because 0.5 is halfway between
+ * 0.0 (mapped to green) and 1.0 (mapped to white).
+ *
+ * The value -0.6 maps to a medium blue color because -0.6 is halfway between
+ * -1.0 (mapped to dark blue) and -0.2 (mapped to light blue).
+ *
+ * The color gradient requires a minimum of two gradient points.
+ *
+ * This class contains two pre-made gradients: a grayscale gradient and a color
+ * gradient suitable for terrain. To use these pre-made gradients, call the
+ * BuildGrayscaleGradient() or BuildTerrainGradient() methods, respectively.
+ *
+ * @note The color value passed to AddGradientPoint() has an alpha channel. This
+ * alpha channel specifies how a pixel in the background image (if specified) is
+ * blended with the calculated color. If the alpha value is high, this class
+ * weighs the blend towards the calculated color, and if the alpha value is low,
+ * this class weighs the blend towards the color from the corresponding pixel in
+ * the background image.
+ *
+ * <b>Specify the light source parameters</b>
+ *
+ * This class contains a parallel light source that lights the image. It
+ * interprets the noise map as a bump map.
+ *
+ * To enable or disable lighting, pass a Boolean value to the EnableLight()
+ * method.
+ *
+ * To set the position of the light source in the "sky", call the
+ * SetLightAzimuth() and SetLightElev() methods.
+ *
+ * To set the color of the light source, call the SetLightColor() method.
+ *
+ * To set the intensity of the light source, call the SetLightIntensity()
+ * method. A good intensity value is 2.0, although that value tends to "wash
+ * out" very light colors from the image.
+ *
+ * To set the contrast amount between areas in light and areas in shadow, call
+ * the SetLightContrast() method. Determining the correct contrast amount
+ * requires some trial and error, but if your application interprets the noise
+ * map as a height map that has its elevation values measured in meters and has
+ * a horizontal resolution of @a h meters, a good contrast amount to use is (
+ * 1.0 / @a h ).
+ *
+ * <b>Specify the background image</b>
+ *
+ * To specify a background image, pass an Image object to the
+ * SetBackgroundImage() method.
+ *
+ * This class determines the color of a pixel in the destination image by
+ * blending the calculated color with the color of the corresponding pixel from
+ * the background image.
+ *
+ * The blend amount is determined by the alpha of the calculated color. If the
+ * alpha value is high, this class weighs the blend towards the calculated
+ * color, and if the alpha value is low, this class weighs the blend towards the
+ * color from the corresponding pixel in the background image.
+ *
+ * <b>Rendering the image</b>
+ *
+ * To render the image, perform the following steps: - Pass a NoiseMap object to
+ * the SetSourceNoiseMap() method. - Pass an Image object to the SetDestImage()
+ * method. - Pass an Image object to the SetBackgroundImage() method (optional)
+ * - Call the Render() method.
+ */
 public class RendererImage {
 
     /**
@@ -148,9 +238,9 @@ public class RendererImage {
      * @param gradientPos The position of this gradient point.
      * @param gradientColor The color of this gradient point.
      *
-     * @pre No two gradient points have the same position.
+     * @noise.pre No two gradient points have the same position.
      *
-     * @throw noise::ExceptionInvalidParam See the preconditions.
+     * @throws IllegalArgumentException See the preconditions.
      *
      * This object uses a color gradient to calculate the color for each pixel
      * in the destination image according to the value from the corresponding
@@ -171,15 +261,15 @@ public class RendererImage {
     }
 
     /**
-     * Builds a grayscale gradient.
+     * Builds a gray scale gradient.
      *
-     * @post The original gradient is cleared and a grayscale gradient is
+     * @noise.post The original gradient is cleared and a grayscale gradient is
      * created.
      *
      * This color gradient contains the following gradient points: - -1.0 maps
      * to black - 1.0 maps to white
      */
-    public void buildGrayscaleGradient() {
+    public final void buildGrayscaleGradient() {
         clearGradient();
         gradient.addGradientPoint(-1, new Color((short) 0, (short) 0, (short) 0,
                 (short) 255));
@@ -190,7 +280,8 @@ public class RendererImage {
     /**
      * Builds a color gradient suitable for terrain.
      *
-     * @post The original gradient is cleared and a terrain gradient is created.
+     * @noise.post The original gradient is cleared and a terrain gradient is
+     * created.
      *
      * This gradient color at position 0.0 is the "sea level". Above that value,
      * the gradient contains greens, browns, and whites. Below that value, the
@@ -226,7 +317,7 @@ public class RendererImage {
      * corresponding position.
      * @param lightValue The intensity of the light at that position.
      *
-     * @returns The destination color.
+     * @return The destination color.
      */
     private Color calcDestColor(
             Color sourceColor,
@@ -292,12 +383,10 @@ public class RendererImage {
             recalcLightValues = false;
         }
         //light calculations
-        /////////////////////
         //I may be wrong but this seems to be calculating the dot product of
         //the light direction and the approximate "normal" of the "height field"
         //represented by the noise. in future I intend to add analytic normals
         //to this library and then that will be able to be used instead of this.
-        /////////////////////
         final double I_MAX = 1;
         double io = I_MAX * SQRT_2 * sinElev / 2;
         double ix = (I_MAX - io) * lightContrast * SQRT_2 * cosElev * cosAzimuth;
@@ -361,7 +450,7 @@ public class RendererImage {
     /**
      * Returns the azimuth of the light source, in degrees.
      *
-     * @returns The azimuth of the light source.
+     * @return The azimuth of the light source.
      *
      * The azimuth is the location of the light source around the horizon: - 0.0
      * degrees is east. - 90.0 degrees is north. - 180.0 degrees is west. -
@@ -374,7 +463,7 @@ public class RendererImage {
     /**
      * Returns the brightness of the light source.
      *
-     * @returns The brightness of the light source.
+     * @return The brightness of the light source.
      */
     public double getLightBrightness() {
         return lightBrightness;
@@ -383,7 +472,7 @@ public class RendererImage {
     /**
      * Returns the color of the light source.
      *
-     * @returns The color of the light source.
+     * @return The color of the light source.
      */
     public Color getLightColor() {
         return lightColor;
@@ -392,7 +481,7 @@ public class RendererImage {
     /**
      * Returns the contrast of the light source.
      *
-     * @returns The contrast of the light source.
+     * @return The contrast of the light source.
      *
      * The contrast specifies how sharp the boundary is between the light-facing
      * areas and the shadowed areas.
@@ -410,7 +499,7 @@ public class RendererImage {
     /**
      * Returns the elevation of the light source, in degrees.
      *
-     * @returns The elevation of the light source.
+     * @return The elevation of the light source.
      *
      * The elevation is the angle above the horizon: - 0 degrees is on the
      * horizon. - 90 degrees is straight up.
@@ -422,7 +511,7 @@ public class RendererImage {
     /**
      * Returns the intensity of the light source.
      *
-     * @returns The intensity of the light source.
+     * @return The intensity of the light source.
      */
     public double getLightIntensity() {
         return lightIntensity;
@@ -431,8 +520,8 @@ public class RendererImage {
     /**
      * Determines if the light source is enabled.
      *
-     * @returns - @a true if the light source is enabled. - @a false if the
-     * light source is disabled.
+     * @return - @a true if the light source is enabled. - @a false if the light
+     * source is disabled.
      */
     boolean isLightEnabled() {
         return isLightEnabled;
@@ -441,7 +530,7 @@ public class RendererImage {
     /**
      * Determines if noise-map wrapping is enabled.
      *
-     * @returns - @a true if noise-map wrapping is enabled. - @a false if
+     * @return - @a true if noise-map wrapping is enabled. - @a false if
      * noise-map wrapping is disabled.
      *
      * This object requires five points (the initial point and its four
@@ -462,16 +551,16 @@ public class RendererImage {
      * Renders the destination image using the contents of the source noise map
      * and an optional background image.
      *
-     * @pre SetSourceNoiseMap() has been previously called.
-     * @pre SetDestImage() has been previously called.
-     * @pre There are at least two gradient points in the color gradient.
-     * @pre No two gradient points have the same position.
-     * @pre If a background image was specified, it has the exact same size as
-     * the source height map.
+     * @noise.pre SetSourceNoiseMap() has been previously called.
+     * @noise.pre SetDestImage() has been previously called.
+     * @noise.pre There are at least two gradient points in the color gradient.
+     * @noise.pre No two gradient points have the same position.
+     * @noise.pre If a background image was specified, it has the exact same
+     * size as the source height map.
      *
-     * @post The original contents of the destination image is destroyed.
+     * @noise.post The original contents of the destination image is destroyed.
      *
-     * @throw noise::ExceptionInvalidParam See the preconditions.
+     * @throws IllegalArgumentException See the preconditions.
      *
      * The background image and the destination image can safely refer to the
      * same image, although in this case, the destination image is irretrievably
@@ -682,9 +771,9 @@ public class RendererImage {
      *
      * @param lightContrast The contrast of the light source.
      *
-     * @pre The specified light contrast is positive.
+     * @noise.pre The specified light contrast is positive.
      *
-     * @throw noise::ExceptionInvalidParam See the preconditions.
+     * @throws IllegalArgumentException See the preconditions.
      *
      * The contrast specifies how sharp the boundary is between the light-facing
      * areas and the shadowed areas.
@@ -708,14 +797,9 @@ public class RendererImage {
     }
 
     /**
-     * Returns the intensity of the light source.
+     * Sets the light intensity.
      *
-     * @returns The intensity of the light source.
-     *
-     * A good value for intensity is 2.0.
-     *
-     * Make sure the light source is enabled via a call to the EnableLight()
-     * method before calling the Render() method.
+     * @param lightIntensity
      */
     public void setLightIntensity(double lightIntensity) {
         if (lightIntensity < 0.0) {
@@ -738,5 +822,8 @@ public class RendererImage {
             NoiseMap sourceNoiseMap) {
         this.sourceNoiseMap = sourceNoiseMap;
     }
+
+    private static final Logger LOG
+            = Logger.getLogger(RendererImage.class.getName());
 
 };

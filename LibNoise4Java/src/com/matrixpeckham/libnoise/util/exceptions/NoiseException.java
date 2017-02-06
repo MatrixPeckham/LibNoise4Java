@@ -21,21 +21,48 @@ public class NoiseException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default constructor.
+     */
     public NoiseException() {
     }
 
+    /**
+     * Constructor with message.
+     *
+     * @param message
+     */
     public NoiseException(String message) {
         super(message);
     }
 
+    /**
+     * Constructor with message and cause.
+     *
+     * @param message
+     * @param cause
+     */
     public NoiseException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Constructor with cause.
+     *
+     * @param cause
+     */
     public NoiseException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Constructor with message, cause and boolean flags.
+     *
+     * @param message
+     * @param cause
+     * @param enableSuppression
+     * @param writableStackTrace
+     */
     public NoiseException(String message, Throwable cause,
             boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);

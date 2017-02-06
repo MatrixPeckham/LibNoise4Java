@@ -10,8 +10,9 @@ package com.matrixpeckham.libnoise.util;
 import static com.matrixpeckham.libnoise.util.Globals.RASTER_MAX_HEIGHT;
 import static com.matrixpeckham.libnoise.util.Globals.RASTER_MAX_WIDTH;
 import static java.lang.System.arraycopy;
+import java.util.logging.Logger;
 
-public class NoiseMap {
+public final class NoiseMap {
 
     /**
      * Value used for all positions outside of the noise map.
@@ -61,12 +62,11 @@ public class NoiseMap {
      * @param width The width of the new noise map.
      * @param height The height of the new noise map.
      *
-     * @pre The width and height values are positive.
-     * @pre The width and height values do not exceed the maximum possible width
-     * and height for the noise map.
+     * @noise.pre The width and height values are positive.
+     * @noise.pre The width and height values do not exceed the maximum possible
+     * width and height for the noise map.
      *
-     * @throw noise::ExceptionInvalidParam See the preconditions.
-     * @throw noise::ExceptionOutOfMemory Out of memory.
+     * @throws IllegalArgumentException See the preconditions.
      *
      * Creates a noise map with uninitialized values.
      *
@@ -80,7 +80,7 @@ public class NoiseMap {
     /**
      * Copy constructor.
      *
-     * @throw noise::ExceptionOutOfMemory Out of memory.
+     * @param rhs NoiseMap to copy
      */
     public NoiseMap(NoiseMap rhs) {
         initObj();
@@ -94,7 +94,7 @@ public class NoiseMap {
      * @param width The width of the noise map.
      * @param height The height of the noise map.
      *
-     * @returns The minimum amount of memory required to store the noise map.
+     * @return The minimum amount of memory required to store the noise map.
      *
      * The returned value is measured by the number of @a double values required
      * to store the noise map, not by the number of bytes.
@@ -108,7 +108,7 @@ public class NoiseMap {
      *
      * @param width The width of the noise map.
      *
-     * @returns The stride amount.
+     * @return The stride amount.
      *
      * - The <i>stride amount</i> is the offset between the starting points of
      * any two adjacent slabs in a noise map. - The stride amount is measured by
@@ -141,7 +141,7 @@ public class NoiseMap {
      *
      * @param source The source noise map.
      *
-     * @throw noise::ExceptionOutOfMemory Out of memory.
+     * @throws noise::ExceptionOutOfMemory Out of memory.
      *
      * This method reallocates the buffer in this noise map object if necessary.
      *
@@ -176,7 +176,7 @@ public class NoiseMap {
     /**
      * Returns the value used for all positions outside of the noise map.
      *
-     * @returns The value used for all positions outside of the noise map.
+     * @return The value used for all positions outside of the noise map.
      *
      * All positions outside of the noise map are assumed to have a common value
      * known as the <i>border value</i>.
@@ -188,7 +188,7 @@ public class NoiseMap {
     /**
      * Returns the height of the noise map.
      *
-     * @returns The height of the noise map.
+     * @return The height of the noise map.
      */
     public int getHeight() {
         return height;
@@ -197,7 +197,7 @@ public class NoiseMap {
     /**
      * Returns the amount of memory allocated for this noise map.
      *
-     * @returns The amount of memory allocated for this noise map.
+     * @return The amount of memory allocated for this noise map.
      *
      * This method returns the number of @a double values allocated.
      */
@@ -211,7 +211,7 @@ public class NoiseMap {
      * @param x The x coordinate of the position.
      * @param y The y coordinate of the position.
      *
-     * @returns The value at that position.
+     * @return The value at that position.
      *
      * This method returns the border value if the coordinates exist outside of
      * the noise map.
@@ -229,7 +229,7 @@ public class NoiseMap {
     /**
      * Returns the width of the noise map.
      *
-     * @returns The width of the noise map.
+     * @return The width of the noise map.
      */
     public int getWidth() {
         return width;
@@ -238,8 +238,8 @@ public class NoiseMap {
     /**
      * Initializes the noise map object.
      *
-     * @pre Must be called during object construction.
-     * @pre The noise map buffer must not exist.
+     * @noise.pre Must be called during object construction.
+     * @noise.pre The noise map buffer must not exist.
      */
     private void initObj() {
         noiseMap = null;
@@ -252,10 +252,6 @@ public class NoiseMap {
 
     /**
      * Reallocates the noise map to recover wasted memory.
-     *
-     * @throw noise::ExceptionOutOfMemory Out of memory. (Yes, this method can
-     * return an out-of-memory exception because two noise maps will temporarily
-     * exist in memory during this call.)
      *
      * The contents of the noise map is unaffected.
      */
@@ -291,12 +287,11 @@ public class NoiseMap {
      * @param width The new width for the noise map.
      * @param height The new height for the noise map.
      *
-     * @pre The width and height values are positive.
-     * @pre The width and height values do not exceed the maximum possible width
-     * and height for the noise map.
+     * @noise.pre The width and height values are positive.
+     * @noise.pre The width and height values do not exceed the maximum possible
+     * width and height for the noise map.
      *
-     * @throw noise::ExceptionInvalidParam See the preconditions.
-     * @throw noise::ExceptionOutOfMemory Out of memory.
+     * @throws IllegalArgumentException See the preconditions.
      *
      * On exit, the contents of the noise map are undefined.
      *
@@ -364,5 +359,7 @@ public class NoiseMap {
         noiseMap = source.noiseMap;
         source.initObj();
     }
+
+    private static final Logger LOG = Logger.getLogger(NoiseMap.class.getName());
 
 }
