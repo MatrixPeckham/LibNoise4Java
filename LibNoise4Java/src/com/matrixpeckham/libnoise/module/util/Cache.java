@@ -63,32 +63,34 @@ public class Cache<T extends Module> extends ForwardModule<T> {
 
     /**
      * Default Constructor
+     *
+     * @param m Module to wrap
      */
     public Cache(T m) {
-        super(m);
-        isCached = false;
+	super(m);
+	isCached = false;
     }
 
+    //simple implementation based on forward module
     @Override
     public double getValue(double x, double y, double z) {
-        //extreamly simple caching scheme
-        if (!(isCached && xCache == x && yCache == y && zCache == z)) {
-            cachedValue = super.getValue(x, y, z);
-            xCache = x;
-            yCache = y;
-            zCache = z;
-        }
-        isCached = true;
-        return cachedValue;
+	//extreamly simple caching scheme
+	if (!(isCached && xCache == x && yCache == y && zCache == z)) {
+	    cachedValue = super.getValue(x, y, z);
+	    xCache = x;
+	    yCache = y;
+	    zCache = z;
+	}
+	isCached = true;
+	return cachedValue;
     }
 
     @Override
     public void setSourceModule(int index,
-            com.matrixpeckham.libnoise.module.Module source) {
-        super.setSourceModule(index, source);
-        isCached = false;
+	    com.matrixpeckham.libnoise.module.Module source) {
+	super.setSourceModule(index, source);
+	isCached = false;
     }
-    
 
     private static final Logger LOG = Logger.getLogger(Cache.class.getName());
 

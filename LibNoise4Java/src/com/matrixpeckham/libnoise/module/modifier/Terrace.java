@@ -73,6 +73,7 @@ import java.util.logging.Logger;
  *
  * This noise module requires one source module.
  */
+//TODO: Should this be a forwarding extender?
 public class Terrace extends AbstractModule {
 
     /**
@@ -90,8 +91,8 @@ public class Terrace extends AbstractModule {
      * constructor
      */
     public Terrace() {
-        controlPoints = new ArrayList<>();
-        invertTerraces = false;
+	controlPoints = new ArrayList<>();
+	invertTerraces = false;
     }
 
     /**
@@ -111,11 +112,11 @@ public class Terrace extends AbstractModule {
      * It does not matter which order these points are added.
      */
     public void addControlPoint(double value) {
-        //find the insertion point for the new control point and insert the new
-        //point at that position. the control point array will remain sorted by
-        //value.
-        int insertionPos = findInsertionPos(value);
-        insertAtPos(insertionPos, value);
+	//find the insertion point for the new control point and insert the new
+	//point at that position. the control point array will remain sorted by
+	//value.
+	int insertionPos = findInsertionPos(value);
+	insertAtPos(insertionPos, value);
     }
 
     /**
@@ -124,7 +125,7 @@ public class Terrace extends AbstractModule {
      * @noise.post All control points on the terrace-forming curve are deleted.
      */
     public void clearAllControlPoints() {
-        controlPoints.clear();
+	controlPoints.clear();
     }
 
     /**
@@ -145,22 +146,22 @@ public class Terrace extends AbstractModule {
      * maps a value onto the curve requires a sorted control point array.
      */
     protected int findInsertionPos(double value) {
-        int insertionPos;
+	int insertionPos;
 
-        for (insertionPos = 0; insertionPos < controlPoints.size();
-                insertionPos++) {
-            if (value < controlPoints.get(insertionPos)) {
-                //we found the array index in which to insert the new control point
-                break;
-            } else if (value == controlPoints.get(insertionPos)) {
-                //each control point is required to contain a unique value, so
-                //throw an exception
-                throw new IllegalArgumentException(
-                        "Control points must be unique");
-            }
-        }
+	for (insertionPos = 0; insertionPos < controlPoints.size();
+		insertionPos++) {
+	    if (value < controlPoints.get(insertionPos)) {
+		//we found the array index in which to insert the new control point
+		break;
+	    } else if (value == controlPoints.get(insertionPos)) {
+		//each control point is required to contain a unique value, so
+		//throw an exception
+		throw new IllegalArgumentException(
+			"Control points must be unique");
+	    }
+	}
 
-        return insertionPos;
+	return insertionPos;
     }
 
     /**
@@ -181,7 +182,7 @@ public class Terrace extends AbstractModule {
      * calls another method of this object.
      */
     public List<Double> getControlPointArray() {
-        return controlPoints;
+	return controlPoints;
     }
 
     /**
@@ -190,53 +191,53 @@ public class Terrace extends AbstractModule {
      * @return The number of control points on the terrace-forming curve.
      */
     public int getControlPointCount() {
-        return controlPoints.size();
+	return controlPoints.size();
     }
 
     @Override
     public int getSourceModuleCount() {
-        return 1;
+	return 1;
     }
 
     @Override
     public double getValue(double x, double y, double z) {
-        //get the output value from the source module
-        double sourceModuleValue = sourceModule[0].getValue(x, y, z);
-        //find the first element in the control point array that has a value
-        //larger than the output value fromt he source module
-        int indexPos;
-        for (indexPos = 0; indexPos < controlPoints.size(); indexPos++) {
-            if (sourceModuleValue < controlPoints.get(indexPos)) {
-                break;
-            }
-        }
-        //find the two nearest control points so that we can map their values
-        //onto a quadratic cure
-        int index0
-                = clampValue(indexPos - 1, 0, controlPoints.size()
-                        - 1);
-        int index1 = clampValue(indexPos, 0, controlPoints.size() - 1);
-        //if some control points are missin (which occurs if the output value of
-        //the source module is greater than the larger value or less than the
-        //smallest value of the control point array, get the value of the
-        //nearest control point and exit
-        if (index0 == index1) {
-            return controlPoints.get(index1);
-        }
-        //compute the alpha value used for linear interpolation
-        double value0 = controlPoints.get(index0);
-        double value1 = controlPoints.get(index1);
-        double alpha = (sourceModuleValue - value0) / (value1 - value0);
-        if (invertTerraces) {
-            alpha = 1.0 - alpha;
-            double t = value0;
-            value0 = value1;
-            value1 = t;
-        }
-        //squareing the alpha produces the terrace effect.
-        alpha *= alpha;
-        //now linear interpolate
-        return linearInterp(value0, value1, alpha);
+	//get the output value from the source module
+	double sourceModuleValue = sourceModule[0].getValue(x, y, z);
+	//find the first element in the control point array that has a value
+	//larger than the output value fromt he source module
+	int indexPos;
+	for (indexPos = 0; indexPos < controlPoints.size(); indexPos++) {
+	    if (sourceModuleValue < controlPoints.get(indexPos)) {
+		break;
+	    }
+	}
+	//find the two nearest control points so that we can map their values
+	//onto a quadratic cure
+	int index0
+		= clampValue(indexPos - 1, 0, controlPoints.size()
+			- 1);
+	int index1 = clampValue(indexPos, 0, controlPoints.size() - 1);
+	//if some control points are missin (which occurs if the output value of
+	//the source module is greater than the larger value or less than the
+	//smallest value of the control point array, get the value of the
+	//nearest control point and exit
+	if (index0 == index1) {
+	    return controlPoints.get(index1);
+	}
+	//compute the alpha value used for linear interpolation
+	double value0 = controlPoints.get(index0);
+	double value1 = controlPoints.get(index1);
+	double alpha = (sourceModuleValue - value0) / (value1 - value0);
+	if (invertTerraces) {
+	    alpha = 1.0 - alpha;
+	    double t = value0;
+	    value0 = value1;
+	    value1 = t;
+	}
+	//squareing the alpha produces the terrace effect.
+	alpha *= alpha;
+	//now linear interpolate
+	return linearInterp(value0, value1, alpha);
     }
 
     /**
@@ -256,8 +257,8 @@ public class Terrace extends AbstractModule {
      * should be inserted at the position in which the order is still preserved.
      */
     protected void insertAtPos(int insertionPos, double value) {
-        //we don't need bookkeeping
-        controlPoints.add(insertionPos, value);
+	//we don't need bookkeeping
+	controlPoints.add(insertionPos, value);
     }
 
     /**
@@ -265,7 +266,7 @@ public class Terrace extends AbstractModule {
      * the control points.
      */
     public void invertTerraces() {
-        invertTerraces(true);
+	invertTerraces(true);
     }
 
     /**
@@ -276,7 +277,7 @@ public class Terrace extends AbstractModule {
      * points.
      */
     public void invertTerraces(boolean invert) {
-        invertTerraces = invert;
+	invertTerraces = invert;
     }
 
     /**
@@ -287,7 +288,7 @@ public class Terrace extends AbstractModule {
      * @a false if the curve between the control points is not inverted.
      */
     public boolean isTerracesInverted() {
-        return invertTerraces;
+	return invertTerraces;
     }
 
     /**
@@ -310,16 +311,16 @@ public class Terrace extends AbstractModule {
      * control points, its slope resets to zero.
      */
     public void makeControlPoints(int controlPointCount) {
-        if (controlPointCount < 2) {
-            throw new IllegalArgumentException("Need two or more control points");
-        }
-        clearAllControlPoints();
-        double terraceStep = 2.0 / (controlPointCount - 1.0);
-        double curValue = -1.0;
-        for (int i = 0; i < controlPointCount; i++) {
-            addControlPoint(curValue);
-            curValue += terraceStep;
-        }
+	if (controlPointCount < 2) {
+	    throw new IllegalArgumentException("Need two or more control points");
+	}
+	clearAllControlPoints();
+	double terraceStep = 2.0 / (controlPointCount - 1.0);
+	double curValue = -1.0;
+	for (int i = 0; i < controlPointCount; i++) {
+	    addControlPoint(curValue);
+	    curValue += terraceStep;
+	}
     }
 
     private static final Logger LOG = Logger.getLogger(Terrace.class.getName());

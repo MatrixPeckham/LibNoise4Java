@@ -45,9 +45,9 @@ public class Vec3 {
      * @param z
      */
     public Vec3(double x, double y, double z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+	this.x = x;
+	this.y = y;
+	this.z = z;
     }
 
     /**
@@ -56,9 +56,9 @@ public class Vec3 {
      * @param o
      */
     public void addLocal(Vec3 o) {
-        x += o.x;
-        y += o.y;
-        z += o.z;
+	x += o.x;
+	y += o.y;
+	z += o.z;
     }
 
     /**
@@ -68,11 +68,11 @@ public class Vec3 {
      * @return
      */
     public Vec3 add(Vec3 o) {
-        Vec3 ret = new Vec3();
-        ret.x = x + o.x;
-        ret.y = y + o.y;
-        ret.z = z + o.z;
-        return ret;
+	Vec3 ret = new Vec3();
+	ret.x = x + o.x;
+	ret.y = y + o.y;
+	ret.z = z + o.z;
+	return ret;
     }
 
     /**
@@ -81,9 +81,9 @@ public class Vec3 {
      * @param o
      */
     public void subLocal(Vec3 o) {
-        x -= o.x;
-        y -= o.y;
-        z -= o.z;
+	x -= o.x;
+	y -= o.y;
+	z -= o.z;
     }
 
     /**
@@ -94,11 +94,11 @@ public class Vec3 {
      * @return
      */
     public Vec3 sub(Vec3 o) {
-        Vec3 ret = new Vec3();
-        ret.x = x - o.x;
-        ret.y = y - o.y;
-        ret.z = z - o.z;
-        return ret;
+	Vec3 ret = new Vec3();
+	ret.x = x - o.x;
+	ret.y = y - o.y;
+	ret.z = z - o.z;
+	return ret;
     }
 
     /**
@@ -107,9 +107,9 @@ public class Vec3 {
      * @param d
      */
     public void mulLocal(double d) {
-        x *= d;
-        y *= d;
-        z *= d;
+	x *= d;
+	y *= d;
+	z *= d;
     }
 
     /**
@@ -119,13 +119,14 @@ public class Vec3 {
      * @return
      */
     public Vec3 mul(double d) {
-        Vec3 ret = new Vec3();
-        ret.x = x * d;
-        ret.y = y * d;
-        ret.z = z * d;
-        return ret;
+	Vec3 ret = new Vec3();
+	ret.x = x * d;
+	ret.y = y * d;
+	ret.z = z * d;
+	return ret;
     }
 
+    //logger so that we don't get "no logger" warning
     private static final Logger LOG = Logger.getLogger(Vec3.class.getName());
 
 }

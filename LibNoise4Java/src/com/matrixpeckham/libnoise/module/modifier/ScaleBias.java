@@ -22,6 +22,7 @@ import java.util.logging.Logger;
  *
  * This noise module requires one source module.
  */
+//TODO: Should this be a forwarding extender?
 public class ScaleBias extends AbstractModule {
 
     /**
@@ -45,8 +46,8 @@ public class ScaleBias extends AbstractModule {
     protected double scale;
 
     public ScaleBias() {
-        scale = DEFAULT_SCALE;
-        bias = DEFAULT_BIAS;
+	scale = DEFAULT_SCALE;
+	bias = DEFAULT_BIAS;
     }
 
     /**
@@ -60,7 +61,7 @@ public class ScaleBias extends AbstractModule {
      * the value.
      */
     public double getBias() {
-        return bias;
+	return bias;
     }
 
     /**
@@ -74,17 +75,17 @@ public class ScaleBias extends AbstractModule {
      * the value.
      */
     public double getScale() {
-        return scale;
+	return scale;
     }
 
     @Override
     public int getSourceModuleCount() {
-        return 1;
+	return 1;
     }
 
     @Override
     public double getValue(double x, double y, double z) {
-        return sourceModule[0].getValue(x, y, z) * scale + bias;
+	return sourceModule[0].getValue(x, y, z) * scale + bias;
     }
 
     /**
@@ -97,7 +98,7 @@ public class ScaleBias extends AbstractModule {
      * the value.
      */
     public void setBias(double bias) {
-        this.bias = bias;
+	this.bias = bias;
     }
 
     /**
@@ -111,10 +112,10 @@ public class ScaleBias extends AbstractModule {
      * the value.
      */
     public void setScale(double scale) {
-        this.scale = scale;
+	this.scale = scale;
     }
 
     private static final Logger LOG
-            = Logger.getLogger(ScaleBias.class.getName());
+	    = Logger.getLogger(ScaleBias.class.getName());
 
 }

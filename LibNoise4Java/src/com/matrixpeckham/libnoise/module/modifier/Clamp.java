@@ -29,6 +29,7 @@ import java.util.logging.Logger;
  *
  * This noise module requires one source module.
  */
+//TODO: Should this be a forwarding extender?
 public class Clamp extends AbstractModule {
 
     /**
@@ -61,8 +62,8 @@ public class Clamp extends AbstractModule {
      * noise::module::DEFAULT_CLAMP_UPPER_BOUND.
      */
     public Clamp() {
-        lowerBound = DEFAULT_CLAMP_LOWER_BOUND;
-        upperBound = DEFAULT_CLAMP_UPPER_BOUND;
+	lowerBound = DEFAULT_CLAMP_LOWER_BOUND;
+	upperBound = DEFAULT_CLAMP_UPPER_BOUND;
     }
 
     /**
@@ -75,12 +76,12 @@ public class Clamp extends AbstractModule {
      * bound.
      */
     public double getLowerBound() {
-        return lowerBound;
+	return lowerBound;
     }
 
     @Override
     public int getSourceModuleCount() {
-        return 1;
+	return 1;
     }
 
     /**
@@ -93,19 +94,19 @@ public class Clamp extends AbstractModule {
      * upper bound.
      */
     public double getUpperBound() {
-        return upperBound;
+	return upperBound;
     }
 
     @Override
     public double getValue(double x, double y, double z) {
-        double value = sourceModule[0].getValue(x, y, z);
-        if (value < lowerBound) {
-            return lowerBound;
-        } else if (value > upperBound) {
-            return upperBound;
-        } else {
-            return value;
-        }
+	double value = sourceModule[0].getValue(x, y, z);
+	if (value < lowerBound) {
+	    return lowerBound;
+	} else if (value > upperBound) {
+	    return upperBound;
+	} else {
+	    return value;
+	}
     }
 
     /**
@@ -124,8 +125,8 @@ public class Clamp extends AbstractModule {
      * the upper bound.
      */
     public void setBounds(double lower, double upper) {
-        lowerBound = lower;
-        upperBound = upper;
+	lowerBound = lower;
+	upperBound = upper;
     }
 
     private static final Logger LOG = Logger.getLogger(Clamp.class.getName());

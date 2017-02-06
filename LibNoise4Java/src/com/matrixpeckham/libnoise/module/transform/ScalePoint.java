@@ -25,6 +25,7 @@ import java.util.logging.Logger;
  *
  * This noise module requires one source module.
  */
+//TODO: Should this be a forwarding extender
 public class ScalePoint extends AbstractModule {
 
     /**
@@ -52,19 +53,19 @@ public class ScalePoint extends AbstractModule {
      * Default Constructor.
      */
     public ScalePoint() {
-        xScale = DEFAULT_SCALE_POINT_X;
-        yScale = DEFAULT_SCALE_POINT_Y;
-        zScale = DEFAULT_SCALE_POINT_Z;
+	xScale = DEFAULT_SCALE_POINT_X;
+	yScale = DEFAULT_SCALE_POINT_Y;
+	zScale = DEFAULT_SCALE_POINT_Z;
     }
 
     @Override
     public int getSourceModuleCount() {
-        return 1;
+	return 1;
     }
 
     @Override
     public double getValue(double x, double y, double z) {
-        return sourceModule[0].getValue(x * xScale, y * yScale, z * zScale);
+	return sourceModule[0].getValue(x * xScale, y * yScale, z * zScale);
     }
 
     /**
@@ -73,7 +74,7 @@ public class ScalePoint extends AbstractModule {
      * @return
      */
     public double getxScale() {
-        return xScale;
+	return xScale;
     }
 
     /**
@@ -82,7 +83,7 @@ public class ScalePoint extends AbstractModule {
      * @return
      */
     public double getyScale() {
-        return yScale;
+	return yScale;
     }
 
     /**
@@ -91,7 +92,7 @@ public class ScalePoint extends AbstractModule {
      * @return
      */
     public double getzScale() {
-        return zScale;
+	return zScale;
     }
 
     /**
@@ -100,7 +101,7 @@ public class ScalePoint extends AbstractModule {
      * @param scale
      */
     public void setScale(double scale) {
-        xScale = yScale = zScale = scale;
+	xScale = yScale = zScale = scale;
     }
 
     /**
@@ -111,9 +112,9 @@ public class ScalePoint extends AbstractModule {
      * @param z
      */
     public void setScale(double x, double y, double z) {
-        xScale = x;
-        yScale = y;
-        zScale = z;
+	xScale = x;
+	yScale = y;
+	zScale = z;
     }
 
     /**
@@ -122,7 +123,7 @@ public class ScalePoint extends AbstractModule {
      * @param xScale
      */
     public void setxScale(double xScale) {
-        this.xScale = xScale;
+	this.xScale = xScale;
     }
 
     /**
@@ -131,7 +132,7 @@ public class ScalePoint extends AbstractModule {
      * @param yScale
      */
     public void setyScale(double yScale) {
-        this.yScale = yScale;
+	this.yScale = yScale;
     }
 
     /**
@@ -140,10 +141,10 @@ public class ScalePoint extends AbstractModule {
      * @param zScale
      */
     public void setzScale(double zScale) {
-        this.zScale = zScale;
+	this.zScale = zScale;
     }
 
     private static final Logger LOG
-            = Logger.getLogger(ScalePoint.class.getName());
+	    = Logger.getLogger(ScalePoint.class.getName());
 
 }

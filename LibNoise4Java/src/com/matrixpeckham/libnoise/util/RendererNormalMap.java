@@ -61,10 +61,10 @@ public class RendererNormalMap {
      * Constructor.
      */
     public RendererNormalMap() {
-        bumpHeight = 1;
-        isWrapEnabled = false;
-        destImage = null;
-        sourceNoiseMap = null;
+	bumpHeight = 1;
+	isWrapEnabled = false;
+	destImage = null;
+	sourceNoiseMap = null;
     }
 
     /**
@@ -91,22 +91,22 @@ public class RendererNormalMap {
      * application.
      */
     private Color calcNormalColor(double nc, double nr, double nu,
-            double bumpHeight) {
-        // Calculate the surface normal.
-        nc *= bumpHeight;
-        nr *= bumpHeight;
-        nu *= bumpHeight;
-        double ncr = (nc - nr);
-        double ncu = (nc - nu);
-        double d = sqrt((ncu * ncu) + (ncr * ncr) + 1);
-        double vxc = (nc - nr) / d;
-        double vyc = (nc - nu) / d;
-        double vzc = 1.0 / d;
-        short xc, yc, zc;
-        xc = (short) ((int) (floor((vxc + 1.0) * 127.5)) & 0xff);
-        yc = (short) ((int) (floor((vyc + 1.0) * 127.5)) & 0xff);
-        zc = (short) ((int) (floor((vzc + 1.0) * 127.5)) & 0xff);
-        return new Color(xc, yc, zc, (short) 255);
+	    double bumpHeight) {
+	// Calculate the surface normal.
+	nc *= bumpHeight;
+	nr *= bumpHeight;
+	nu *= bumpHeight;
+	double ncr = (nc - nr);
+	double ncu = (nc - nu);
+	double d = sqrt((ncu * ncu) + (ncr * ncr) + 1);
+	double vxc = (nc - nr) / d;
+	double vyc = (nc - nu) / d;
+	double vzc = 1.0 / d;
+	short xc, yc, zc;
+	xc = (short) ((int) (floor((vxc + 1.0) * 127.5)) & 0xff);
+	yc = (short) ((int) (floor((vyc + 1.0) * 127.5)) & 0xff);
+	zc = (short) ((int) (floor((vzc + 1.0) * 127.5)) & 0xff);
+	return new Color(xc, yc, zc, (short) 255);
     }
 
     /**
@@ -125,14 +125,14 @@ public class RendererNormalMap {
      * maps.
      */
     public void enableWrap(boolean enable) {
-        isWrapEnabled = enable;
+	isWrapEnabled = enable;
     }
 
     /**
      * Convenience function for enableWrap(true).
      */
     public void enableWrap() {
-        enableWrap(true);
+	enableWrap(true);
     }
 
     /**
@@ -149,7 +149,7 @@ public class RendererNormalMap {
      * application.
      */
     public double getBumpHeight() {
-        return bumpHeight;
+	return bumpHeight;
     }
 
     /**
@@ -169,7 +169,7 @@ public class RendererNormalMap {
      * maps.
      */
     boolean isWrapEnabled() {
-        return isWrapEnabled;
+	return isWrapEnabled;
     }
 
     /**
@@ -183,58 +183,58 @@ public class RendererNormalMap {
      * @throws IllegalArgumentException See the preconditions.
      */
     public void render() {
-        if (sourceNoiseMap == null
-                || destImage == null
-                || sourceNoiseMap.getWidth() <= 0
-                || sourceNoiseMap.getHeight() <= 0) {
-            throw new IllegalArgumentException();
-        }
+	if (sourceNoiseMap == null
+		|| destImage == null
+		|| sourceNoiseMap.getWidth() <= 0
+		|| sourceNoiseMap.getHeight() <= 0) {
+	    throw new IllegalArgumentException();
+	}
 
-        int width = sourceNoiseMap.getWidth();
-        int height = sourceNoiseMap.getHeight();
+	int width = sourceNoiseMap.getWidth();
+	int height = sourceNoiseMap.getHeight();
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
+	for (int y = 0; y < height; y++) {
+	    for (int x = 0; x < width; x++) {
 
-                // Calculate the positions of the current point's right and up
-                // neighbors.
-                int xRightOffset, yUpOffset;
-                if (isWrapEnabled) {
-                    if (x == width - 1) {
-                        xRightOffset = -(width - 1);
-                    } else {
-                        xRightOffset = 1;
-                    }
-                    if (y == height - 1) {
-                        yUpOffset = -(height - 1);
-                    } else {
-                        yUpOffset = 1;
-                    }
-                } else {
-                    if (x == width - 1) {
-                        xRightOffset = 0;
-                    } else {
-                        xRightOffset = 1;
-                    }
-                    if (y == height - 1) {
-                        yUpOffset = 0;
-                    } else {
-                        yUpOffset = 1;
-                    }
-                }
+		// Calculate the positions of the current point's right and up
+		// neighbors.
+		int xRightOffset, yUpOffset;
+		if (isWrapEnabled) {
+		    if (x == width - 1) {
+			xRightOffset = -(width - 1);
+		    } else {
+			xRightOffset = 1;
+		    }
+		    if (y == height - 1) {
+			yUpOffset = -(height - 1);
+		    } else {
+			yUpOffset = 1;
+		    }
+		} else {
+		    if (x == width - 1) {
+			xRightOffset = 0;
+		    } else {
+			xRightOffset = 1;
+		    }
+		    if (y == height - 1) {
+			yUpOffset = 0;
+		    } else {
+			yUpOffset = 1;
+		    }
+		}
 
-                // Get the noise value of the current point in the source noise map
-                // and the noise values of its right and up neighbors.
-                double nc = sourceNoiseMap.getValue(x, y);
-                double nr = sourceNoiseMap.getValue(x + xRightOffset, y);
-                double nu = sourceNoiseMap.getValue(x, y + yUpOffset);
+		// Get the noise value of the current point in the source noise map
+		// and the noise values of its right and up neighbors.
+		double nc = sourceNoiseMap.getValue(x, y);
+		double nr = sourceNoiseMap.getValue(x + xRightOffset, y);
+		double nu = sourceNoiseMap.getValue(x, y + yUpOffset);
 
-                // Calculate the normal product.
-                destImage.
-                        setValue(x, y, calcNormalColor(nc, nr, nu, bumpHeight));
+		// Calculate the normal product.
+		destImage.
+			setValue(x, y, calcNormalColor(nc, nr, nu, bumpHeight));
 
-            }
-        }
+	    }
+	}
     }
 
     /**
@@ -251,7 +251,7 @@ public class RendererNormalMap {
      * application.
      */
     public void setBumpHeight(double bumpHeight) {
-        this.bumpHeight = bumpHeight;
+	this.bumpHeight = bumpHeight;
     }
 
     /**
@@ -266,7 +266,7 @@ public class RendererNormalMap {
      * unless another image replaces that image.
      */
     public void setDestImage(Image destImage) {
-        this.destImage = destImage;
+	this.destImage = destImage;
     }
 
     /**
@@ -278,10 +278,11 @@ public class RendererNormalMap {
      * unless another image replaces that image.
      */
     public void setSourceNoiseMap(NoiseMap sourceNoiseMap) {
-        this.sourceNoiseMap = sourceNoiseMap;
+	this.sourceNoiseMap = sourceNoiseMap;
     }
 
+    //to prevent "no logger" warning
     private static final Logger LOG
-            = Logger.getLogger(RendererNormalMap.class.getName());
+	    = Logger.getLogger(RendererNormalMap.class.getName());
 
 }
