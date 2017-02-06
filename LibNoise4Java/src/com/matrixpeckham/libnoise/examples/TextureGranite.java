@@ -7,12 +7,12 @@
  */
 package com.matrixpeckham.libnoise.examples;
 
-import com.matrixpeckham.libnoise.module.Add;
-import com.matrixpeckham.libnoise.module.Billow;
 import com.matrixpeckham.libnoise.module.Module;
-import com.matrixpeckham.libnoise.module.ScaleBias;
-import com.matrixpeckham.libnoise.module.Turbulence;
-import com.matrixpeckham.libnoise.module.Voronoi;
+import com.matrixpeckham.libnoise.module.combiner.Add;
+import com.matrixpeckham.libnoise.module.generator.Billow;
+import com.matrixpeckham.libnoise.module.generator.Voronoi;
+import com.matrixpeckham.libnoise.module.modifier.ScaleBias;
+import com.matrixpeckham.libnoise.module.transform.Turbulence;
 import com.matrixpeckham.libnoise.util.Color;
 import com.matrixpeckham.libnoise.util.Image;
 import com.matrixpeckham.libnoise.util.NoiseMap;
@@ -72,11 +72,11 @@ public class TextureGranite {
         // Given the granite noise module, create a non-seamless texture map, a
         // seamless texture map, and a spherical texture map.
         createPlanarTexture(finalGranite, false, TEXTURE_HEIGHT,
-                "textureplane.png");
+                "granite-textureplane.png");
         createPlanarTexture(finalGranite, true, TEXTURE_HEIGHT,
-                "textureseamless.png");
+                "granite-textureseamless.png");
         createSphericalTexture(finalGranite, TEXTURE_HEIGHT,
-                "texturesphere.png");
+                "granite-texturesphere.png");
 
     }
 

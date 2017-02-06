@@ -8,10 +8,10 @@
 package com.matrixpeckham.libnoise.util;
 
 /**
- *
- * @author William Matrix Peckham
+ * Callback class for use with NoiseMap. Replaces function pointer in original
+ * C++.
  */
-@FunctionalInterface
+//@FunctionalInterface//java 1.8 only, commented out for 1.7 compatability
 public interface NoiseMapCallback {
 
     /**

@@ -10,7 +10,13 @@ package com.matrixpeckham.libnoise.util;
 import static com.matrixpeckham.libnoise.util.NoiseQuality.STD;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import java.util.logging.Logger;
 
+/**
+ * Class that houses global values and global helper functions.
+ *
+ * @author William Matrix Peckham
+ */
 public class Globals {
 
     /**
@@ -85,7 +91,7 @@ public class Globals {
      * by these vectors. For more information, see "GPU Gems", Chapter 5 -
      * Implementing Improved Perlin Noise by Ken Perlin, specifically page 76.
      */
-    public static final double[] randomVectors = new double[]{
+    static final double[] randomVectors = new double[]{
         //<editor-fold defaultstate="collapsed" desc="vectors">
         -0.763874, -0.596439, -0.246489, 0.0,
         0.396055, 0.904518, -0.158073, 0.0,
@@ -348,6 +354,11 @@ public class Globals {
 
     /**
      * Performs linear interpolation between two 8-bit channel values.
+     *
+     * @param channel0 value at alpha 0
+     * @param channel1 value at alpha 1
+     * @param alpha value of interpolation
+     * @return interpolated value
      */
     public static short blendChannel(short channel0, short channel1,
             double alpha) {
@@ -359,6 +370,7 @@ public class Globals {
     /**
      * Clamps a value onto a clamping range. @param value The value to clamp.
      *
+     * @param value value to clamp
      * @param lowerBound The lower bound of the clamping range.
      *
      * @param upperBound The upper bound of the clamping range.
@@ -375,6 +387,26 @@ public class Globals {
         } else {
             return value;
         }
+    }
+
+    /**
+     * Generic version of clamp.
+     *
+     * @param <T> parameter type value, must be comparable
+     * @param value value to clamp
+     * @param lowerBound lower bound
+     * @param upperBound upper bound
+     * @return
+     */
+    public static <T extends Comparable<? super T>> T clampValue(T value,
+            T lowerBound, T upperBound) {
+        if (value.compareTo(lowerBound) < 0) {
+            return lowerBound;
+        }
+        if (value.compareTo(upperBound) > 0) {
+            return upperBound;
+        }
+        return value;
     }
 
     /**
@@ -405,6 +437,7 @@ public class Globals {
     /**
      * Returns the maximum of two values.
      *
+     * @param <T> Type to change
      * @param a The first value.
      * @param b The second value.
      *
@@ -420,6 +453,7 @@ public class Globals {
     /**
      * Returns the minimum of two values.
      *
+     * @param <T> type parameter that needs to be comparable
      * @param a The first value.
      * @param b The second value.
      *
@@ -529,14 +563,14 @@ public class Globals {
      *
      * @return The generated gradient-noise value.
      *
-     * @pre The difference between @a fx and @a ix must be less than or equal to
-     * one.
+     * @noise.pre The difference between @a fx and @a ix must be less than or
+     * equal to one.
      *
-     * @pre The difference between @a fy and @a iy must be less than or equal to
-     * one.
+     * @noise.pre The difference between @a fy and @a iy must be less than or
+     * equal to one.
      *
-     * @pre The difference between @a fz and @a iz must be less than or equal to
-     * one.
+     * @noise.pre The difference between @a fz and @a iz must be less than or
+     * equal to one.
      *
      * A <i>gradient</i>-noise function generates better-quality noise than a
      * <i>value</i>-noise function. Most noise modules use gradient noise for
@@ -564,7 +598,7 @@ public class Globals {
                 = (X_NOISE_GEN * ix
                 + Y_NOISE_GEN * iy
                 + Z_NOISE_GEN * iz
-                + SEED_NOISE_GEN * seed) & 0xffff_ffff;
+                + SEED_NOISE_GEN * seed);
         vectorIndex ^= (vectorIndex >> SHIFT_NOISE_GEN);
         vectorIndex &= 0xff;
         double xvGradient = randomVectors[(vectorIndex << 2)];
@@ -594,18 +628,17 @@ public class Globals {
      * @param ix The integer @a x coordinate of a nearby value.
      * @param iy The integer @a y coordinate of a nearby value.
      * @param iz The integer @a z coordinate of a nearby value.
-     * @param seed The random number seed.
      *
      * @return The generated gradient-noise value.
      *
-     * @pre The difference between @a fx and @a ix must be less than or equal to
-     * one.
+     * @noise.pre The difference between @a fx and @a ix must be less than or
+     * equal to one.
      *
-     * @pre The difference between @a fy and @a iy must be less than or equal to
-     * one.
+     * @noise.pre The difference between @a fy and @a iy must be less than or
+     * equal to one.
      *
-     * @pre The difference between @a fz and @a iz must be less than or equal to
-     * one.
+     * @noise.pre The difference between @a fz and @a iz must be less than or
+     * equal to one.
      *
      * A <i>gradient</i>-noise function generates better-quality noise than a
      * <i>value</i>-noise function. Most noise modules use gradient noise for
@@ -639,6 +672,12 @@ public class Globals {
      * The return value ranges from 0 to 2147483647. A noise function differs
      * from a random -number generator because it always returns the same output
      * value if the same input value is passed to it
+     *
+     * @param x integer location x
+     * @param y integer location y
+     * @param z integer location z
+     * @param seed seed value
+     * @return noise value at cell
      */
     public static int intValueNoise3D(int x, int y, int z, int seed) {
         // All constants are primes and must remain prime in order for this noise
@@ -662,6 +701,11 @@ public class Globals {
      * The return value ranges from 0 to 2147483647. A noise function differs
      * from a random -number generator because it always returns the same output
      * value if the same input value is passed to it
+     *
+     * @param x integer location x
+     * @param y integer location y
+     * @param z integer location z
+     * @return noise value at cell
      */
     public static int intValueNoise3D(int x, int y, int z) {
         return intValueNoise3D(x, y, z, 0);
@@ -707,6 +751,11 @@ public class Globals {
     /**
      * Performs linear interpolation between two colors and stores the result in
      * out.
+     *
+     * @param color0 color at 0 alpha
+     * @param color1 color at 1 alpha
+     * @param alpha interpolation value
+     * @param out color to set to the value of the interpolation
      */
     public static void linearInterpColor(Color color0, Color color1,
             double alpha, Color out) {
@@ -848,8 +897,6 @@ public class Globals {
      * @param x The @a x coordinate of the input value.
      * @param y The @a y coordinate of the input value.
      * @param z The @a z coordinate of the input value.
-     * @param seed The random number seed.
-     * @param noiseQuality The quality of the coherent-noise.
      *
      * @return The generated value-coherent-noise value.
      *
@@ -889,7 +936,6 @@ public class Globals {
      * @param x The @a x coordinate of the input value.
      * @param y The @a y coordinate of the input value.
      * @param z The @a z coordinate of the input value.
-     * @param seed A random number seed.
      *
      * @return The generated value-noise value.
      *
@@ -901,5 +947,7 @@ public class Globals {
     public static double valueNoise3D(int x, int y, int z) {
         return valueNoise3D(x, y, z, 0);
     }
+
+    private static final Logger LOG = Logger.getLogger(Globals.class.getName());
 
 }

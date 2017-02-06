@@ -8,10 +8,31 @@
 package com.matrixpeckham.libnoise.util;
 
 import com.matrixpeckham.libnoise.model.Cylinder;
+import java.util.logging.Logger;
 
-
+/**
+ * Builds a cylindrical noise map.
+ *
+ * This class builds a noise map by filling it with coherent-noise values
+ * generated from the surface of a cylinder.
+ *
+ * This class describes these input values using an (angle, height) coordinate
+ * system. After generating the coherent-noise value from the input value, it
+ * then "flattens" these coordinates onto a plane so that it can write the
+ * values into a two-dimensional noise map.
+ *
+ * The cylinder model has a radius of 1.0 unit and has infinite height. The
+ * cylinder is oriented along the @a y axis. Its center is at the origin.
+ *
+ * The x coordinate in the noise map represents the angle around the cylinder's
+ * y axis. The y coordinate in the noise map represents the height above the x-z
+ * plane.
+ *
+ * The application must provide the lower and upper angle bounds of the noise
+ * map, in degrees, and the lower and upper height bounds of the noise map, in
+ * units.
+ */
 public class NoiseMapBuilderCylinder extends NoiseMapBuilder {
-
 
     /**
      * Lower angle boundary of the cylindrical noise map, in degrees.
@@ -63,11 +84,10 @@ public class NoiseMapBuilderCylinder extends NoiseMapBuilder {
         double heightExtent = upperHeightBound - lowerHeightBound;
         double xDelta = angleExtent / destWidth;
         double yDelta = heightExtent / destHeight;
-        double curAngle = lowerAngleBound;
         double curHeight = lowerHeightBound;
         // Fill every point in the noise map with the output values from the model.
         for (int y = 0; y < destHeight; y++) {
-            curAngle = lowerAngleBound;
+            double curAngle = lowerAngleBound;
             for (int x = 0; x < destWidth; x++) {
                 float curValue = (float) cylinderModel.getValue(curAngle,
                         curHeight);
@@ -84,7 +104,7 @@ public class NoiseMapBuilderCylinder extends NoiseMapBuilder {
     /**
      * Returns the lower angle boundary of the cylindrical noise map.
      *
-     * @returns The lower angle boundary of the noise map, in degrees.
+     * @return The lower angle boundary of the noise map, in degrees.
      */
     public double getLowerAngleBound() {
         return lowerAngleBound;
@@ -93,7 +113,7 @@ public class NoiseMapBuilderCylinder extends NoiseMapBuilder {
     /**
      * Returns the lower height boundary of the cylindrical noise map.
      *
-     * @returns The lower height boundary of the noise map, in units.
+     * @return The lower height boundary of the noise map, in units.
      *
      * One unit is equal to the radius of the cylinder.
      */
@@ -104,7 +124,7 @@ public class NoiseMapBuilderCylinder extends NoiseMapBuilder {
     /**
      * Returns the upper angle boundary of the cylindrical noise map.
      *
-     * @returns The upper angle boundary of the noise map, in degrees.
+     * @return The upper angle boundary of the noise map, in degrees.
      */
     public double getUpperAngleBound() {
         return upperAngleBound;
@@ -113,7 +133,7 @@ public class NoiseMapBuilderCylinder extends NoiseMapBuilder {
     /**
      * Returns the upper height boundary of the cylindrical noise map.
      *
-     * @returns The upper height boundary of the noise map, in units.
+     * @return The upper height boundary of the noise map, in units.
      *
      * One unit is equal to the radius of the cylinder.
      */
@@ -133,10 +153,12 @@ public class NoiseMapBuilderCylinder extends NoiseMapBuilder {
      * @param upperHeightBound The upper height boundary of the noise map, in
      * units.
      *
-     * @pre The lower angle boundary is less than the upper angle boundary.
-     * @pre The lower height boundary is less than the upper height boundary.
+     * @noise.pre The lower angle boundary is less than the upper angle
+     * boundary.
+     * @noise.pre The lower height boundary is less than the upper height
+     * boundary.
      *
-     * @throw noise::ExceptionInvalidParam See the preconditions.
+     * @throws IllegalArgumentException See the preconditions.
      *
      * One unit is equal to the radius of the cylinder.
      */
@@ -152,5 +174,8 @@ public class NoiseMapBuilderCylinder extends NoiseMapBuilder {
         this.lowerHeightBound = lowerHeightBound;
         this.upperHeightBound = upperHeightBound;
     }
+
+    private static final Logger LOG
+            = Logger.getLogger(NoiseMapBuilderCylinder.class.getName());
 
 }

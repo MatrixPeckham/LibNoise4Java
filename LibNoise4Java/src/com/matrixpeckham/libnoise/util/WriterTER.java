@@ -9,6 +9,7 @@ package com.matrixpeckham.libnoise.util;
 
 import static com.matrixpeckham.libnoise.util.Globals.DEFAULT_METERS_PER_POINT;
 import static com.matrixpeckham.libnoise.util.Globals.getMin;
+import com.matrixpeckham.libnoise.util.exceptions.ExceptionUnknown;
 import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -18,8 +19,29 @@ import static java.lang.Math.floor;
 import static java.nio.ByteBuffer.allocate;
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import static java.util.logging.Logger.getLogger;
 
+/**
+ * Terragen Terrain writer class.
+ *
+ * This class creates a file in Terrage Terrain (*.ter) format given the
+ * contents of a noise map object. This class treats the values in the noise map
+ * as elevations measured in meters.
+ *
+ * <a href=http://www.planetside.co.uk/terragen/>Terragen</a> is a terrain
+ * application that renders realistic landscapes. Terragen is available for
+ * Windows and MacOS; unfortunately, Terragen does not have UN*X versions.
+ *
+ * <b>Writing the noise map</b>
+ *
+ * To write the noise map, perform the following steps: - Pass the filename to
+ * the SetDestFilename() method. - Pass a NoiseMap object to the
+ * SetSourceNoiseMap() method. - Call the WriteDestFile() method.
+ *
+ * The SetDestFilename() and SetSourceNoiseMap() methods must be called before
+ * calling the WriteDestFile() method.
+ */
 public class WriterTER {
 
     /**
@@ -50,25 +72,25 @@ public class WriterTER {
      *
      * @param width The width of the noise map, in points.
      *
-     * @returns The width of one horizontal line in the file.
+     * @return The width of one horizontal line in the file.
      */
     int calcWidthByteCount(int width) {
 
-        return width * Integer.BYTES;
+        return width * Integer.SIZE / 8;
     }
 
     private byte[] getBytes(short sh) {
-        return allocate(Short.BYTES).order(LITTLE_ENDIAN).
+        return allocate(Short.SIZE / 8).order(LITTLE_ENDIAN).
                 putShort(sh).array();
     }
 
     private byte[] getBytes(int sh) {
-        return allocate(Integer.BYTES).order(LITTLE_ENDIAN).
+        return allocate(Integer.SIZE / 8).order(LITTLE_ENDIAN).
                 putInt(sh).array();
     }
 
     private byte[] getBytes(float sh) {
-        return allocate(Float.BYTES).order(LITTLE_ENDIAN).
+        return allocate(Float.SIZE / 8).order(LITTLE_ENDIAN).
                 putFloat(sh).array();
     }
 
@@ -87,13 +109,13 @@ public class WriterTER {
     /**
      * Writes the contents of the noise map object to the file.
      *
-     * @pre SetDestFilename() has been previously called.
-     * @pre SetSourceNoiseMap() has been previously called.
+     * @throws java.io.FileNotFoundException
+     * @noise.pre SetDestFilename() has been previously called.
+     * @noise.pre SetSourceNoiseMap() has been previously called.
      *
-     * @throw noise::ExceptionInvalidParam See the preconditions.
-     * @throw noise::ExceptionOutOfMemory Out of memory.
-     * @throw noise::ExceptionUnknown An unknown exception occurred. Possibly
-     * the file could not be written.
+     * @throws IllegalArgumentException See the preconditions.
+     * @throws ExceptionUnknown An unknown exception occurred. Possibly the file
+     * could not be written.
      *
      * This method encodes the contents of the noise map and writes it to a
      * file. Before calling this method, call the SetSourceNoiseMap() method to
@@ -145,5 +167,36 @@ public class WriterTER {
                             os.flush();
                         }
     }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setDestFilename(String fileName) {
+        setFileName(fileName);
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public double getMetersPerPoint() {
+        return metersPerPoint;
+    }
+
+    public void setMetersPerPoint(double metersPerPoint) {
+        this.metersPerPoint = metersPerPoint;
+    }
+
+    public NoiseMap getSourceNoiseMap() {
+        return sourceNoiseMap;
+    }
+
+    public void setSourceNoiseMap(NoiseMap sourceNoiseMap) {
+        this.sourceNoiseMap = sourceNoiseMap;
+    }
+
+    private static final Logger LOG
+            = Logger.getLogger(WriterTER.class.getName());
 
 }

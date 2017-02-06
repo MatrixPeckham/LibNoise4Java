@@ -10,17 +10,46 @@ package com.matrixpeckham.libnoise.util;
 import static com.matrixpeckham.libnoise.util.Globals.clampValue;
 import static com.matrixpeckham.libnoise.util.Globals.linearInterpColor;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
-
+/**
+ * Defines a color gradient.
+ *
+ * A color gradient is a list of gradually-changing colors. A color gradient is
+ * defined by a list of <i>gradient points</i>. Each gradient point has a
+ * position and a color. In a color gradient, the colors between two adjacent
+ * gradient points are linearly interpolated.
+ *
+ * To add a gradient point to the color gradient, pass its position and color to
+ * the AddGradientPoint() method.
+ *
+ * To retrieve a color from a specific position in the color gradient, pass that
+ * position to the GetColor() method.
+ *
+ * This class is a useful tool for coloring height maps based on elevation.
+ *
+ * <b>Gradient example</b>
+ *
+ * Suppose a gradient object contains the following gradient points: - -1.0 maps
+ * to black. - 0.0 maps to white. - 1.0 maps to red.
+ *
+ * If an application passes -0.5 to the GetColor() method, this method will
+ * return a gray color that is halfway between black and white.
+ *
+ * If an application passes 0.25 to the GetColor() method, this method will
+ * return a very light pink color that is one quarter of the way between white
+ * and red.
+ */
 public class GradientColor {
 
     /**
      * Array that stores the gradient points.
      */
-    ArrayList<GradientPoint> gradientPoints;
+    List<GradientPoint> gradientPoints;
 
     /* A color object that is used by a gradient object to store a
-    temporary value.*/
+     temporary value.*/
     Color workingColor = new Color();
 
     public GradientColor() {
@@ -33,9 +62,9 @@ public class GradientColor {
      * @param gradientPos The position of this gradient point.
      * @param gradientColor The color of this gradient point.
      *
-     * @pre No two gradient points have the same position.
+     * @noise.pre No two gradient points have the same position.
      *
-     * @throw noise::ExceptionInvalidParam See the precondition.
+     * @throws IllegalArgumentException See the precondition.
      *
      * It does not matter which order these gradient points are added.
      */
@@ -49,7 +78,7 @@ public class GradientColor {
     /**
      * Deletes all the gradient points from this gradient object.
      *
-     * @post All gradient points from this gradient object are deleted.
+     * @noise.post All gradient points from this gradient object are deleted.
      */
     public void clear() {
         gradientPoints.clear();
@@ -61,11 +90,11 @@ public class GradientColor {
      *
      * @param gradientPos The position of this gradient point.
      *
-     * @returns The array index in which to insert the gradient point.
+     * @return The array index in which to insert the gradient point.
      *
-     * @pre No two gradient points have the same input value.
+     * @noise.pre No two gradient points have the same input value.
      *
-     * @throw noise::ExceptionInvalidParam See the precondition.
+     * @throws noise::ExceptionInvalidParam See the precondition.
      *
      * By inserting the gradient point at the returned array index, this object
      * ensures that the gradient-point array is sorted by input value. The code
@@ -94,7 +123,7 @@ public class GradientColor {
      *
      * @param gradientPos The specified position.
      *
-     * @returns The color at that position.
+     * @return The color at that position.
      */
     public Color getColor(double gradientPos) {
         // Find the first element in the gradient point array that has a gradient
@@ -134,7 +163,7 @@ public class GradientColor {
     /**
      * Returns a pointer to the array of gradient points in this object.
      *
-     * @returns A pointer to the array of gradient points.
+     * @return A pointer to the array of gradient points.
      *
      * Before calling this method, call GetGradientPointCount() to determine the
      * number of gradient points in this array.
@@ -143,14 +172,14 @@ public class GradientColor {
      * later use since the pointer to the array may change if the application
      * calls another method of this object.
      */
-    public ArrayList<GradientPoint> getGradientPointArray() {
+    public List<GradientPoint> getGradientPointArray() {
         return gradientPoints;
     }
 
     /**
      * Returns the number of gradient points stored in this object.
      *
-     * @returns The number of gradient points stored in this object.
+     * @return The number of gradient points stored in this object.
      */
     public int getGradientPointCount() {
         return gradientPoints.size();
@@ -202,5 +231,8 @@ public class GradientColor {
         public Color color;
 
     }
+
+    private static final Logger LOG
+            = Logger.getLogger(GradientColor.class.getName());
 
 }

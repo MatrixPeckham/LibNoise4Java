@@ -10,7 +10,7 @@ package com.matrixpeckham.libnoise.util;
 import com.matrixpeckham.libnoise.module.Module;
 
 /**
- * Abstract base class for a noise-map builder
+ * Abstract base class for a noise-map builder.
  *
  * A builder class builds a noise map by filling it with coherent-noise values
  * generated from the surface of a three-dimensional mathematical object. Each
@@ -29,8 +29,8 @@ import com.matrixpeckham.libnoise.module.Module;
  * coordinates to the SetBounds() method. - Pass the noise map size, in points,
  * to the SetDestSize() method. - Pass a NoiseMap object to the
  * SetDestNoiseMap() method. - Pass a noise module (derived from
- * noise::module::Module) to the SetSourceModule() method. - Call the Build()
- * method.
+ * noise::module::AbstractModule) to the SetSourceModule() method. - Call the
+ * Build() method.
  *
  * You may also pass a callback function to the SetCallback() method. The
  * Build() method calls this callback function each time it fills a row of the
@@ -43,7 +43,6 @@ import com.matrixpeckham.libnoise.module.Module;
  * coordinate system.
  */
 public abstract class NoiseMapBuilder {
-
 
     /**
      * The callback function that Build() calls each time it fills a row of the
@@ -59,7 +58,6 @@ public abstract class NoiseMapBuilder {
      * Height of the destination noise map, in points.
      */
     protected int destHeight;
-
 
     /**
      * Destination noise map that will contain the coherent-noise values.
@@ -90,17 +88,18 @@ public abstract class NoiseMapBuilder {
     /**
      * Builds the noise map.
      *
-     * @pre SetBounds() was previously called.
-     * @pre SetDestNoiseMap() was previously called.
-     * @pre SetSourceModule() was previously called.
-     * @pre The width and height values specified by SetDestSize() are positive.
-     * @pre The width and height values specified by SetDestSize() do not exceed
-     * the maximum possible width and height for the noise map.
+     * @noise.pre SetBounds() was previously called.
+     * @noise.pre SetDestNoiseMap() was previously called.
+     * @noise.pre SetSourceModule() was previously called.
+     * @noise.pre The width and height values specified by SetDestSize() are
+     * positive.
+     * @noise.pre The width and height values specified by SetDestSize() do not
+     * exceed the maximum possible width and height for the noise map.
      *
-     * @post The original contents of the destination noise map is destroyed.
+     * @noise.post The original contents of the destination noise map is
+     * destroyed.
      *
-     * @throw noise::ExceptionInvalidParam See the preconditions.
-     * @throw noise::ExceptionOutOfMemory Out of memory.
+     * @throws IllegalStateException See the preconditions.
      *
      * If this method is successful, the destination noise map contains the
      * coherent-noise values from the noise module specified by
@@ -111,7 +110,7 @@ public abstract class NoiseMapBuilder {
     /**
      * Returns the height of the destination noise map.
      *
-     * @returns The height of the destination noise map, in points.
+     * @return The height of the destination noise map, in points.
      *
      * This object does not change the height in the destination noise map
      * object until the Build() method is called.
@@ -123,7 +122,7 @@ public abstract class NoiseMapBuilder {
     /**
      * Returns the width of the destination noise map.
      *
-     * @returns The width of the destination noise map, in points.
+     * @return The width of the destination noise map, in points.
      *
      * This object does not change the height in the destination noise map
      * object until the Build() method is called.

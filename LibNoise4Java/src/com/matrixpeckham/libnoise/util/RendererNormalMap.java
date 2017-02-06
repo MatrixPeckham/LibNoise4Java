@@ -9,8 +9,32 @@ package com.matrixpeckham.libnoise.util;
 
 import static java.lang.Math.floor;
 import static java.lang.Math.sqrt;
+import java.util.logging.Logger;
 
-
+/**
+ * Renders a normal map from a noise map.
+ *
+ * This class renders an image containing the normal vectors from a noise map
+ * object. This image can then be used as a bump map for a 3D application or
+ * game.
+ *
+ * This class encodes the (x, y, z) components of the normal vector into the
+ * (red, green, blue) channels of the image. Like any 24-bit true-color image,
+ * the channel values range from 0 to 255. 0 represents a normal coordinate of
+ * -1.0 and 255 represents a normal coordinate of +1.0.
+ *
+ * You should also specify the <i>bump height</i> before rendering the normal
+ * map. The bump height specifies the ratio of spatial resolution to elevation
+ * resolution. For example, if your noise map has a spatial resolution of 30
+ * meters and an elevation resolution of one meter, set the bump height to 1.0 /
+ * 30.0.
+ *
+ * <b>Rendering the normal map</b>
+ *
+ * To render the image containing the normal map, perform the following steps: -
+ * Pass a NoiseMap object to the SetSourceNoiseMap() method. - Pass an Image
+ * object to the SetDestImage() method. - Call the Render() method.
+ */
 public class RendererNormalMap {
 
     /**
@@ -51,7 +75,7 @@ public class RendererNormalMap {
      * @param nu The height of the up neighbor.
      * @param bumpHeight The bump height.
      *
-     * @returns The normal vector represented as a color.
+     * @return The normal vector represented as a color.
      *
      * This method encodes the (x, y, z) components of the normal vector into
      * the (red, green, blue) channels of the returned color. In order to
@@ -66,7 +90,8 @@ public class RendererNormalMap {
      * The spatial resolution and elevation resolution are determined by the
      * application.
      */
-    private Color calcNormalColor(double nc, double nr, double nu, double bumpHeight) {
+    private Color calcNormalColor(double nc, double nr, double nu,
+            double bumpHeight) {
         // Calculate the surface normal.
         nc *= bumpHeight;
         nr *= bumpHeight;
@@ -81,7 +106,7 @@ public class RendererNormalMap {
         xc = (short) ((int) (floor((vxc + 1.0) * 127.5)) & 0xff);
         yc = (short) ((int) (floor((vyc + 1.0) * 127.5)) & 0xff);
         zc = (short) ((int) (floor((vzc + 1.0) * 127.5)) & 0xff);
-        return new Color(xc, yc, zc, (short) 0);
+        return new Color(xc, yc, zc, (short) 255);
     }
 
     /**
@@ -103,6 +128,9 @@ public class RendererNormalMap {
         isWrapEnabled = enable;
     }
 
+    /**
+     * Convenience function for enableWrap(true).
+     */
     public void enableWrap() {
         enableWrap(true);
     }
@@ -110,7 +138,7 @@ public class RendererNormalMap {
     /**
      * Returns the bump height.
      *
-     * @returns The bump height.
+     * @return The bump height.
      *
      * The bump height specifies the ratio of spatial resolution to elevation
      * resolution. For example, if your noise map has a spatial resolution of 30
@@ -127,7 +155,7 @@ public class RendererNormalMap {
     /**
      * Determines if noise-map wrapping is enabled.
      *
-     * @returns - @a true if noise-map wrapping is enabled. - @a false if
+     * @return - @a true if noise-map wrapping is enabled. - @a false if
      * noise-map wrapping is disabled.
      *
      * This object requires three points (the initial point and the right and up
@@ -147,12 +175,12 @@ public class RendererNormalMap {
     /**
      * Renders the noise map to the destination image.
      *
-     * @pre SetSourceNoiseMap() has been previously called.
-     * @pre SetDestImage() has been previously called.
+     * @noise.pre SetSourceNoiseMap() has been previously called.
+     * @noise.pre SetDestImage() has been previously called.
      *
-     * @post The original contents of the destination image is destroyed.
+     * @noise.post The original contents of the destination image is destroyed.
      *
-     * @throw noise::ExceptionInvalidParam See the preconditions.
+     * @throws IllegalArgumentException See the preconditions.
      */
     public void render() {
         if (sourceNoiseMap == null
@@ -253,5 +281,7 @@ public class RendererNormalMap {
         this.sourceNoiseMap = sourceNoiseMap;
     }
 
+    private static final Logger LOG
+            = Logger.getLogger(RendererNormalMap.class.getName());
 
 }
