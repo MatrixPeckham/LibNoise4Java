@@ -25,7 +25,6 @@ import java.util.logging.Logger;
  *
  * This noise module requires one source module.
  */
-//TODO: Should this also be a forwarding extender?
 public class TranslatePoint extends AbstractModule {
 
     /**

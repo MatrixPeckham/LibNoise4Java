@@ -33,6 +33,8 @@ import java.util.logging.Logger;
  * in which it is included.
  *
  * This noise module requires one source module.
+ *
+ * @param <T>
  */
 public class Cache<T extends Module> extends ForwardModule<T> {
 
@@ -86,10 +88,19 @@ public class Cache<T extends Module> extends ForwardModule<T> {
     }
 
     @Override
-    public void setSourceModule(int index,
-	    com.matrixpeckham.libnoise.module.Module source) {
+    public void setSourceModule(int index, Module source) {
 	super.setSourceModule(index, source);
 	isCached = false;
+    }
+
+    @Override
+    public String getName() {
+	return "Cached (" + super.getName() + " )";
+    }
+
+    @Override
+    public String toString() {
+	return getName();
     }
 
     private static final Logger LOG = Logger.getLogger(Cache.class.getName());

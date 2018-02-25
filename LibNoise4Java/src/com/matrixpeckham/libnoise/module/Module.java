@@ -66,6 +66,25 @@ public interface Module {
      */
     public double getValue(double x, double y, double z);
 
+    /**
+     * Sets a child module at a specific index.
+     *
+     * @param index
+     * @param source
+     */
     public void setSourceModule(int index, Module source);
 
+    /**
+     * gets a displayable name for this module.
+     *
+     * @return
+     */
+    public String getName();
+
+    /**
+     * sets a displayable name for this module
+     *
+     * @param name
+     */
+    public void setName(String name);
 }

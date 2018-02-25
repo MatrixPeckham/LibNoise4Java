@@ -32,7 +32,6 @@ import java.util.logging.Logger;
  *
  * @author William Matrix Peckham
  */
-//TODO: Should this be a forwarding extender?
 public class RotatePoint extends AbstractModule {
 
     /**

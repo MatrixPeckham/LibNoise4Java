@@ -37,7 +37,6 @@ import java.util.logging.Logger;
  *
  * This noise module requires one source module.
  */
-//TODO: Should this be a forwarding extender?
 public class Curve extends AbstractModule {
 
     /**

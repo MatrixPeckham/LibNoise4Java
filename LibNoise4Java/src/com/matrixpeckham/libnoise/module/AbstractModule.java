@@ -177,6 +177,11 @@ import com.matrixpeckham.libnoise.util.exceptions.ExceptionNoModule;
 public abstract class AbstractModule implements Module {
 
     /**
+     * Display name for the module. Defaults to the simple name of the class.
+     */
+    protected String name;
+
+    /**
      * Array of modules to use as source.
      *
      */
@@ -188,14 +193,16 @@ public abstract class AbstractModule implements Module {
      *
      */
     public AbstractModule() {
-        int sourceModuleCount = getSourceModuleCount();
-        //create the array of pointers
-        if (sourceModuleCount > 0) {
-            sourceModule = new Module[sourceModuleCount];
-            for (int i = 0; i < sourceModuleCount; i++) {
-                sourceModule[i] = null;
-            }
-        }
+	this.name = this.getClass().getSimpleName();
+	int sourceModuleCount = getSourceModuleCount();
+	//create the array of pointers
+	//TODO: I don't think the loop is actually required here, in C++ it is.
+	if (sourceModuleCount > 0) {
+	    sourceModule = new Module[sourceModuleCount];
+	    for (int i = 0; i < sourceModuleCount; i++) {
+		sourceModule[i] = null;
+	    }
+	}
     }
 
     /**
@@ -217,19 +224,34 @@ public abstract class AbstractModule implements Module {
      */
     @Override
     public Module getSourceModule(int index) {
-        if (index >= getSourceModuleCount() || index < 0 || sourceModule[index]
-                == null) {
-            throw new ExceptionNoModule();
-        }
-        return sourceModule[index];
+	if (index >= getSourceModuleCount() || index < 0 || sourceModule[index]
+		== null) {
+	    throw new ExceptionNoModule();
+	}
+	return sourceModule[index];
     }
 
     @Override
     public void setSourceModule(int index, Module source) {
-        if (index >= getSourceModuleCount() || index < 0) {
-            throw new IllegalArgumentException("source index out of bounds");
-        }
-        sourceModule[index] = source;
+	if (index >= getSourceModuleCount() || index < 0) {
+	    throw new IllegalArgumentException("source index out of bounds");
+	}
+	sourceModule[index] = source;
+    }
+
+    @Override
+    public String getName() {
+	return name;
+    }
+
+    @Override
+    public void setName(String name) {
+	this.name = name;
+    }
+
+    @Override
+    public String toString() {
+	return name;
     }
 
 }

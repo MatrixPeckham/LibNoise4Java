@@ -66,6 +66,16 @@ public class ForwardModule<T extends Module> implements Module {
 	inner.setSourceModule(index, source);
     }
 
+    @Override
+    public void setName(String name) {
+	inner.setName(name);
+    }
+
+    @Override
+    public String getName() {
+	return inner.getName();
+    }
+
     private static final Logger LOG
 	    = Logger.getLogger(ForwardModule.class.getName());
 
