@@ -7,13 +7,15 @@
  */
 package com.matrixpeckham.libnoise.module.generator;
 
-import com.matrixpeckham.libnoise.module.AbstractModule;
-import static com.matrixpeckham.libnoise.util.Globals.gradientCoherentNoise3D;
+import static com.matrixpeckham.libnoise.util.Globals.gradientCoherentNoise6D;
 import static com.matrixpeckham.libnoise.util.Globals.makeIntRange;
-import com.matrixpeckham.libnoise.util.NoiseQuality;
 import static com.matrixpeckham.libnoise.util.NoiseQuality.STD;
 import static java.lang.Math.abs;
 import static java.lang.Math.pow;
+
+import com.matrixpeckham.libnoise.module.AbstractModule;
+import com.matrixpeckham.libnoise.module.NoiseSample;
+import com.matrixpeckham.libnoise.util.NoiseQuality;
 import java.util.logging.Logger;
 
 /**
@@ -191,7 +193,7 @@ public class RidgedMulti extends AbstractModule {
 
     /**
      * Calculates the spectral weights for each octave.
-     *
+     * <p>
      * This method is called when the lacunarity changes.
      */
     protected final void calcSpectralWeights() {
@@ -275,10 +277,14 @@ public class RidgedMulti extends AbstractModule {
 
     //multifractal code originally written by F. Kenton "Doc Mojo" Musgrave. 1998. Modified by jas for use with libnoise
     @Override
-    public double getValue(double x, double y, double z) {
+    public NoiseSample getNoise(double x, double y, double z, double w, double u,
+            double v) {
         x *= frequency;
         y *= frequency;
         z *= frequency;
+        w *= frequency;
+        u *= frequency;
+        v *= frequency;
         double value = 0;
         double weight = 1;
         //we've exposed offset and gain
@@ -288,10 +294,13 @@ public class RidgedMulti extends AbstractModule {
             double nx = makeIntRange(x);
             double ny = makeIntRange(y);
             double nz = makeIntRange(z);
+            double nw = makeIntRange(z);
+            double nu = makeIntRange(z);
+            double nv = makeIntRange(z);
             //get the coherent noise value
             int localSeed = (seed + curOctave) & 0X7FFF_FFFF;
             double signal
-                    = gradientCoherentNoise3D(nx, ny, nz, localSeed,
+                    = gradientCoherentNoise6D(nx, ny, nz, nw, nu, nv, localSeed,
                             noiseQuality);
             //make the ridges.
             signal = abs(signal);
@@ -316,8 +325,13 @@ public class RidgedMulti extends AbstractModule {
             x *= lacunarity;
             y *= lacunarity;
             z *= lacunarity;
+            w *= lacunarity;
+            u *= lacunarity;
+            v *= lacunarity;
         }
-        return (value * 1.25) - 1.0;
+        NoiseSample s = new NoiseSample();
+        s.value = (value * 1.25) - 1.0;
+        return s;
     }
 
     /**
@@ -350,9 +364,9 @@ public class RidgedMulti extends AbstractModule {
 
     /**
      * sets the lacunarity of the noise
-     *
+     * <p>
      * The lacunarity is the frequency multiplier between successive octaves
-     *
+     * <p>
      * for best results use a number between 1.5-3.5
      *
      * @param lacunarity
@@ -374,11 +388,11 @@ public class RidgedMulti extends AbstractModule {
 
     /**
      * Sets the number of octaves that generate the noise
-     *
+     * <p>
      * The parameter should be between 1 and BILLOW_MAX_OCTAVE
-     *
+     * <p>
      * The number of octaves controls the amount of detail in the billow noise
-     *
+     * <p>
      * the larger the number the more time required to calculate the noise value
      *
      * @param octaveCount

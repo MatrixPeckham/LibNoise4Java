@@ -8,6 +8,7 @@
 package com.matrixpeckham.libnoise.module.util;
 
 import com.matrixpeckham.libnoise.module.Module;
+import com.matrixpeckham.libnoise.module.NoiseSample;
 import java.util.logging.Logger;
 
 /**
@@ -43,6 +44,12 @@ public class ForwardModule<T extends Module> implements Module {
     }
 
     @Override
+    public NoiseSample getNoise(double x, double y, double z, double w, double u,
+            double v) {
+        return inner.getNoise(x, y, z, w, u, v);
+    }
+
+    @Override
     public Module getSourceModule(int index) {
         return inner.getSourceModule(index);
     }
@@ -55,6 +62,27 @@ public class ForwardModule<T extends Module> implements Module {
     @Override
     public double getValue(double x, double y, double z) {
         return inner.getValue(x, y, z);
+    }
+
+    @Override
+    public double getValue(double x) {
+        return inner.getValue(x);
+    }
+
+    @Override
+    public double getValue(double x, double y) {
+        return inner.getValue(x, y);
+    }
+
+    @Override
+    public double getValue(double x, double y, double z, double w) {
+        return inner.getValue(x, y, z, w);
+    }
+
+    @Override
+    public double getValue(double x, double y, double z, double w, double u,
+            double v) {
+        return inner.getValue(x, y, z, w, u, v);
     }
 
     @Override

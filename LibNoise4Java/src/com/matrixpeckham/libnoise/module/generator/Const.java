@@ -8,6 +8,7 @@
 package com.matrixpeckham.libnoise.module.generator;
 
 import com.matrixpeckham.libnoise.module.AbstractModule;
+import com.matrixpeckham.libnoise.module.NoiseSample;
 import java.util.logging.Logger;
 
 /**
@@ -67,11 +68,18 @@ public class Const extends AbstractModule {
      * @param x
      * @param y
      * @param z
+     * @param w
+     * @param u
+     * @param v
+     *
      * @return
      */
     @Override
-    public double getValue(double x, double y, double z) {
-        return constValue;
+    public NoiseSample getNoise(double x, double y, double z, double w, double u,
+            double v) {
+        NoiseSample s = new NoiseSample();
+        s.value = constValue;
+        return s;
     }
 
     /**

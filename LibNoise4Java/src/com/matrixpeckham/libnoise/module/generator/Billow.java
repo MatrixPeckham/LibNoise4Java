@@ -7,12 +7,14 @@
  */
 package com.matrixpeckham.libnoise.module.generator;
 
-import com.matrixpeckham.libnoise.module.AbstractModule;
-import static com.matrixpeckham.libnoise.util.Globals.gradientCoherentNoise3D;
+import static com.matrixpeckham.libnoise.util.Globals.gradientCoherentNoise6D;
 import static com.matrixpeckham.libnoise.util.Globals.makeIntRange;
-import com.matrixpeckham.libnoise.util.NoiseQuality;
 import static com.matrixpeckham.libnoise.util.NoiseQuality.STD;
 import static java.lang.Math.abs;
+
+import com.matrixpeckham.libnoise.module.AbstractModule;
+import com.matrixpeckham.libnoise.module.NoiseSample;
+import com.matrixpeckham.libnoise.util.NoiseQuality;
 import java.util.logging.Logger;
 
 /**
@@ -165,16 +167,23 @@ public class Billow extends AbstractModule {
     }
 
     @Override
-    public double getValue(double x, double y, double z) {
+    public NoiseSample getNoise(double x, double y, double z, double w, double u,
+            double v) {
         double value = 0;
         double curPersistence = 1;
         double nx;
         double ny;
         double nz;
+        double nw;
+        double nu;
+        double nv;
         int localseed;
         x *= frequency;
         y *= frequency;
         z *= frequency;
+        w *= frequency;
+        u *= frequency;
+        v *= frequency;
         for (int curOctave = 0; curOctave < octaveCount;
                 curOctave++) {
             //make sure that these floating point values have the same
@@ -182,11 +191,14 @@ public class Billow extends AbstractModule {
             nx = makeIntRange(x);
             ny = makeIntRange(y);
             nz = makeIntRange(z);
+            nw = makeIntRange(w);
+            nu = makeIntRange(u);
+            nv = makeIntRange(v);
             //get the coherent noise value from the input value
             //and add it to the final result
             localseed = (seed + curOctave) & 0XFFFF_FFFF;
             double signal
-                    = gradientCoherentNoise3D(nx, ny, nz, localseed,
+                    = gradientCoherentNoise6D(nx, ny, nz, nw, nu, nv, localseed,
                             noiseQuality);
             signal = 2.0 * abs(signal) - 1.0;
             value += signal * curPersistence;
@@ -197,7 +209,9 @@ public class Billow extends AbstractModule {
             curPersistence *= persistence;
         }
         value += 0.5;
-        return value;
+        NoiseSample s = new NoiseSample();
+        s.value = value;
+        return s;
     }
 
     /**
@@ -211,9 +225,9 @@ public class Billow extends AbstractModule {
 
     /**
      * sets the lacunarity of the noise
-     *
+     * <p>
      * The lacunarity is the frequency multiplier between successive octaves
-     *
+     * <p>
      * for best results use a number between 1.5-3.5
      *
      * @param lacunarity
@@ -233,11 +247,11 @@ public class Billow extends AbstractModule {
 
     /**
      * Sets the number of octaves that generate the noise
-     *
+     * <p>
      * The parameter should be between 1 and BILLOW_MAX_OCTAVE
-     *
+     * <p>
      * The number of octaves controls the amount of detail in the billow noise
-     *
+     * <p>
      * the larger the number the more time required to calculate the noise value
      *
      * @param octaveCount
@@ -251,9 +265,9 @@ public class Billow extends AbstractModule {
 
     /**
      * Sets the persistence value of the noise.
-     *
+     * <p>
      * the persistence value controls the roughness of the noise
-     *
+     * <p>
      * for best results the persistence value should be between 0-1.
      *
      * @param persistence

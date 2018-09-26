@@ -7,11 +7,12 @@
  */
 package com.matrixpeckham.libnoise.module.generator;
 
-import com.matrixpeckham.libnoise.module.AbstractModule;
-import static com.matrixpeckham.libnoise.util.Globals.gradientCoherentNoise3D;
-import static com.matrixpeckham.libnoise.util.Globals.makeIntRange;
-import com.matrixpeckham.libnoise.util.NoiseQuality;
+import static com.matrixpeckham.libnoise.util.Globals.*;
 import static com.matrixpeckham.libnoise.util.NoiseQuality.STD;
+
+import com.matrixpeckham.libnoise.module.AbstractModule;
+import com.matrixpeckham.libnoise.module.NoiseSample;
+import com.matrixpeckham.libnoise.util.NoiseQuality;
 import java.util.logging.Logger;
 
 /**
@@ -245,10 +246,53 @@ public class Perlin extends AbstractModule {
     }
 
     @Override
+    public NoiseSample getNoise(double x, double y, double z, double w, double u,
+            double v) {
+        double value = 0;
+        double curPersistence = 1;
+        double nx, ny, nz, nw, nu, nv;
+        int localSeed;
+        x *= frequency;
+        y *= frequency;
+        z *= frequency;
+        w *= frequency;
+        u *= frequency;
+        v *= frequency;
+        for (int curOctave = 0; curOctave < octaveCount;
+                curOctave++) {
+            //make sure that these floating point values have the same range as
+            //an integer so that we can pass them to the coherent noise function
+            nx = makeIntRange(x);
+            ny = makeIntRange(y);
+            nz = makeIntRange(z);
+            nw = makeIntRange(w);
+            nu = makeIntRange(u);
+            nv = makeIntRange(v);
+            //get the coherent noise value from the input value and add it to the
+            //final result
+            localSeed = (seed + curOctave) & 0XFFFF_FFFF;
+            double signal
+                    = gradientCoherentNoise6D(nx, ny, nz, nw, nu, nv, localSeed,
+                            noiseQuality);
+            value += signal * curPersistence;
+            //prepare next octave
+            x *= lacunarity;
+            y *= lacunarity;
+            z *= lacunarity;
+            w *= lacunarity;
+            u *= lacunarity;
+            v *= lacunarity;
+            curPersistence *= persistence;
+        }
+        NoiseSample s = new NoiseSample();
+        s.value = value;
+        return s;
+    }
+
     public double getValue(double x, double y, double z) {
         double value = 0;
         double curPersistence = 1;
-        double nx, ny, nz;
+        double nx, ny, nz, nw, nu, nv;
         int localSeed;
         x *= frequency;
         y *= frequency;
@@ -287,9 +331,9 @@ public class Perlin extends AbstractModule {
 
     /**
      * sets the lacunarity of the noise
-     *
+     * <p>
      * The lacunarity is the frequency multiplier between successive octaves
-     *
+     * <p>
      * for best results use a number between 1.5-3.5
      *
      * @param lacunarity
@@ -309,11 +353,11 @@ public class Perlin extends AbstractModule {
 
     /**
      * Sets the number of octaves that generate the noise
-     *
+     * <p>
      * The parameter should be between 1 and BILLOW_MAX_OCTAVE
-     *
+     * <p>
      * The number of octaves controls the amount of detail in the billow noise
-     *
+     * <p>
      * the larger the number the more time required to calculate the noise value
      *
      * @param octaveCount
@@ -327,9 +371,9 @@ public class Perlin extends AbstractModule {
 
     /**
      * Sets the persistence value of the noise.
-     *
+     * <p>
      * the persistence value controls the roughness of the noise
-     *
+     * <p>
      * for best results the persistence value should be between 0-1.
      *
      * @param persistence

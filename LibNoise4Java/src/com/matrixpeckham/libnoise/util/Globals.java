@@ -10,6 +10,7 @@ package com.matrixpeckham.libnoise.util;
 import static com.matrixpeckham.libnoise.util.NoiseQuality.STD;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+
 import java.util.logging.Logger;
 
 /**
@@ -34,6 +35,10 @@ public class Globals {
      * alias for Math.PI
      */
     public static final double PI = 3.1415926535897932385;
+
+    public static final double SQRT_6 = Math.sqrt(6);
+
+    public static final double SQRT_6_X_6 = SQRT_6 * 6;
 
     /**
      * Converts an angle from degrees to radians
@@ -82,6 +87,12 @@ public class Globals {
     private static final int Y_NOISE_GEN = 31_337;
 
     private static final int Z_NOISE_GEN = 6_971;
+
+    private static final int W_NOISE_GEN = 13_249;
+
+    private static final int U_NOISE_GEN = 27_271;
+
+    private static final int V_NOISE_GEN = 16_097;
 
     /**
      * A table of 256 random normalized vectors. Each row is an (x, y, z, 0)
@@ -352,12 +363,60 @@ public class Globals {
 //</editor-fold>
     };
 
+    static final double[] randomVectors6;
+
+    static {
+        randomVectors6 = new double[32768 * 6];
+        int num = 0;
+        for (int i = 0; i < 45; i++) {
+            for (int x = -1; x <= 1; x++) {
+                for (int y = -1; y <= 1; y++) {
+                    for (int z = -1; z <= 1; z++) {
+                        for (int w = -1; w <= 1; w++) {
+                            for (int u = -1; u <= 1; u++) {
+                                for (int v = -1; v <= 1; v++) {
+                                    double len = Math.sqrt(x * x + y * y + z * z
+                                            + w * w + u * u + v * v);
+                                    if (len == 0) {
+                                        continue;
+                                    }
+                                    double dx = x / len;
+                                    double dy = y / len;
+                                    double dz = z / len;
+                                    double dw = w / len;
+                                    double du = u / len;
+                                    double dv = v / len;
+                                    randomVectors6[num++] = dx;
+                                    randomVectors6[num++] = dy;
+                                    randomVectors6[num++] = dz;
+                                    randomVectors6[num++] = dw;
+                                    randomVectors6[num++] = du;
+                                    randomVectors6[num++] = dv;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        double invsq6 = 1 / SQRT_6;
+        for (int i = 0; i < 4; i++) {
+            for (int t = 0; t < 6; t++) {
+                randomVectors6[num++] = invsq6;
+            }
+            for (int t = 0; t < 6; t++) {
+                randomVectors6[num++] = -invsq6;
+            }
+        }
+    }
+
     /**
      * Performs linear interpolation between two 8-bit channel values.
      *
      * @param channel0 value at alpha 0
      * @param channel1 value at alpha 1
-     * @param alpha value of interpolation
+     * @param alpha    value of interpolation
+     *
      * @return interpolated value
      */
     public static short blendChannel(short channel0, short channel1,
@@ -370,14 +429,15 @@ public class Globals {
     /**
      * Clamps a value onto a clamping range. @param value The value to clamp.
      *
-     * @param value value to clamp
+     * @param value      value to clamp
      * @param lowerBound The lower bound of the clamping range.
      *
      * @param upperBound The upper bound of the clamping range.
+     *
      * @return - @a value if @a value lies between @a lowerBound and @a
-     * upperBound. - @a lowerBound if @a value is less than @a lowerBound. - @a
-     * upperBound if @a value is greater than @a upperBound. This function does
-     * not modify any parameters.
+     *         upperBound. - @a lowerBound if @a value is less than @a lowerBound. - @a
+     *         upperBound if @a value is greater than @a upperBound. This function does
+     *         not modify any parameters.
      */
     public static int clampValue(int value, int lowerBound, int upperBound) {
         if (value < lowerBound) {
@@ -392,10 +452,11 @@ public class Globals {
     /**
      * Generic version of clamp.
      *
-     * @param <T> parameter type value, must be comparable
-     * @param value value to clamp
+     * @param <T>        parameter type value, must be comparable
+     * @param value      value to clamp
      * @param lowerBound lower bound
      * @param upperBound upper bound
+     *
      * @return
      */
     public static <T extends Comparable<? super T>> T clampValue(T value,
@@ -417,7 +478,8 @@ public class Globals {
      * @param n1 The first value.
      * @param n2 The second value.
      * @param n3 The value after the second value.
-     * @param a The alpha value
+     * @param a  The alpha value
+     *
      * @return The alpha value
      *
      * The alpha value should range from 0.0 to 1.0. If the alpha value is 0.0,
@@ -438,8 +500,8 @@ public class Globals {
      * Returns the maximum of two values.
      *
      * @param <T> Type to change
-     * @param a The first value.
-     * @param b The second value.
+     * @param a   The first value.
+     * @param b   The second value.
      *
      * @return The maximum of the two values.
      */
@@ -454,8 +516,8 @@ public class Globals {
      * Returns the minimum of two values.
      *
      * @param <T> type parameter that needs to be comparable
-     * @param a The first value.
-     * @param b The second value.
+     * @param a   The first value.
+     * @param b   The second value.
      *
      * @return The minimum of the two values.
      */
@@ -470,10 +532,10 @@ public class Globals {
      * Generates a gradient-coherent-noise value from the coordinates of a
      * three-dimensional input value.
      *
-     * @param x The @a x coordinate of the input value.
-     * @param y The @a y coordinate of the input value.
-     * @param z The @a z coordinate of the input value.
-     * @param seed The random number seed.
+     * @param x            The @a x coordinate of the input value.
+     * @param y            The @a y coordinate of the input value.
+     * @param z            The @a z coordinate of the input value.
+     * @param seed         The random number seed.
      * @param noiseQuality The quality of the coherent-noise.
      *
      * @return The generated gradient-coherent-noise value.
@@ -533,6 +595,200 @@ public class Globals {
      * Generates a gradient-coherent-noise value from the coordinates of a
      * three-dimensional input value.
      *
+     * @param x            The @a x coordinate of the input value.
+     * @param y            The @a y coordinate of the input value.
+     * @param z            The @a z coordinate of the input value.
+     * @param w            The @a w coordinate of the input value.
+     * @param u            The @a u coordinate of the input value.
+     * @param v            The @a v coordinate of the input value.
+     * @param seed         The random number seed.
+     * @param noiseQuality The quality of the coherent-noise.
+     *
+     * @return The generated gradient-coherent-noise value.
+     *
+     * The return value ranges from -1.0 to +1.0.
+     *
+     * For an explanation of the difference between <i>gradient</i> noise and
+     * <i>value</i> noise, see the comments for the GradientNoise3D() function.
+     */
+    public static double gradientCoherentNoise6D(double x, double y, double z,
+            double w, double u, double v,
+            int seed, NoiseQuality noiseQuality) {
+        // Create a unit-length cube aligned along an integer boundary.  This cube
+        // surrounds the input point.
+        int x0 = (x > 0.0 ? (int) x : (int) x - 1);
+        int x1 = x0 + 1;
+        int y0 = (y > 0.0 ? (int) y : (int) y - 1);
+        int y1 = y0 + 1;
+        int z0 = (z > 0.0 ? (int) z : (int) z - 1);
+        int z1 = z0 + 1;
+        int w0 = (w > 0.0 ? (int) w : (int) w - 1);
+        int w1 = w0 + 1;
+        int u0 = (u > 0.0 ? (int) u : (int) u - 1);
+        int u1 = u0 + 1;
+        int v0 = (v > 0.0 ? (int) v : (int) v - 1);
+        int v1 = v0 + 1;
+        double xs = 0, ys = 0, zs = 0, ws = 0, us = 0, vs = 0;
+        switch (noiseQuality) {
+            case FAST:
+                xs = (x - x0);
+                ys = (y - y0);
+                zs = (z - z0);
+                ws = (w - w0);
+                us = (u - u0);
+                vs = (v - v0);
+                break;
+            case STD:
+                xs = sCurve3(x - x0);
+                ys = sCurve3(y - y0);
+                zs = sCurve3(z - z0);
+                ws = sCurve3(w - w0);
+                us = sCurve3(u - u0);
+                vs = sCurve3(v - v0);
+                break;
+            case BEST:
+                xs = sCurve5(x - x0);
+                ys = sCurve5(y - y0);
+                zs = sCurve5(z - z0);
+                ws = sCurve5(w - w0);
+                us = sCurve5(u - u0);
+                vs = sCurve5(v - v0);
+                break;
+        }
+        double n0, n1, ix0, ix1, iy0, iy1, iz0, iz1, iw0, iw1, iu0, iu1;
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z0, w0, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z0, w0, u0, v0, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z0, w0, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z0, w0, u0, v0, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy0 = linearInterp(ix0, ix1, ys);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z1, w0, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z1, w0, u0, v0, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z1, w0, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z1, w0, u0, v0, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy1 = linearInterp(ix0, ix1, ys);
+        iz0 = linearInterp(iy0, iy1, zs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z0, w1, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z0, w1, u0, v0, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z0, w1, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z0, w1, u0, v0, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy0 = linearInterp(ix0, ix1, ys);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z1, w1, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z1, w1, u0, v0, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z1, w1, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z1, w1, u0, v0, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy1 = linearInterp(ix0, ix1, ys);
+        iz1 = linearInterp(iy0, iy1, zs);
+        iw0 = linearInterp(iz0, iz1, ws);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z0, w0, u1, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z0, w0, u1, v0, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z0, w0, u1, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z0, w0, u1, v0, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy0 = linearInterp(ix0, ix1, ys);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z1, w0, u1, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z1, w0, u1, v0, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z1, w0, u1, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z1, w0, u1, v0, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy1 = linearInterp(ix0, ix1, ys);
+        iz0 = linearInterp(iy0, iy1, zs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z0, w1, u1, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z0, w1, u1, v0, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z0, w1, u1, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z0, w1, u1, v0, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy0 = linearInterp(ix0, ix1, ys);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z1, w1, u1, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z1, w1, u1, v0, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z1, w1, u1, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z1, w1, u1, v0, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy1 = linearInterp(ix0, ix1, ys);
+        iz1 = linearInterp(iy0, iy1, zs);
+        iw1 = linearInterp(iz0, iz1, ws);
+        iu0 = linearInterp(iw0, iw1, us);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z0, w0, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z0, w0, u0, v0, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z0, w0, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z0, w0, u0, v0, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy0 = linearInterp(ix0, ix1, ys);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z1, w0, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z1, w0, u0, v0, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z1, w0, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z1, w0, u0, v0, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy1 = linearInterp(ix0, ix1, ys);
+        iz0 = linearInterp(iy0, iy1, zs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z0, w1, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z0, w1, u0, v0, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z0, w1, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z0, w1, u0, v0, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy0 = linearInterp(ix0, ix1, ys);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z1, w1, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z1, w1, u0, v0, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z1, w1, u0, v0, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z1, w1, u0, v0, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy1 = linearInterp(ix0, ix1, ys);
+        iz1 = linearInterp(iy0, iy1, zs);
+        iw0 = linearInterp(iz0, iz1, ws);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z0, w0, u1, v1, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z0, w0, u1, v1, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z0, w0, u1, v1, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z0, w0, u1, v1, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy0 = linearInterp(ix0, ix1, ys);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z1, w0, u1, v1, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z1, w0, u1, v1, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z1, w0, u1, v1, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z1, w0, u1, v1, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy1 = linearInterp(ix0, ix1, ys);
+        iz0 = linearInterp(iy0, iy1, zs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z0, w1, u1, v1, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z0, w1, u1, v1, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z0, w1, u1, v1, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z0, w1, u1, v1, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy0 = linearInterp(ix0, ix1, ys);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y0, z1, w1, u1, v1, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y0, z1, w1, u1, v1, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = gradientNoise6D(x, y, z, w, u, v, x0, y1, z1, w1, u1, v1, seed);
+        n1 = gradientNoise6D(x, y, z, w, u, v, x1, y1, z1, w1, u1, v1, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy1 = linearInterp(ix0, ix1, ys);
+        iz1 = linearInterp(iy0, iy1, zs);
+        iw1 = linearInterp(iz0, iz1, ws);
+        iu1 = linearInterp(iw0, iw1, us);
+        return linearInterp(iu0, iu1, vs);
+    }
+
+    /**
+     * Generates a gradient-coherent-noise value from the coordinates of a
+     * three-dimensional input value.
+     *
      * @param x The @a x coordinate of the input value.
      * @param y The @a y coordinate of the input value.
      * @param z The @a z coordinate of the input value.
@@ -553,12 +809,12 @@ public class Globals {
      * three-dimensional input value and the integer coordinates of a nearby
      * three-dimensional value.
      *
-     * @param fx The floating-point @a x coordinate of the input value.
-     * @param fy The floating-point @a y coordinate of the input value.
-     * @param fz The floating-point @a z coordinate of the input value.
-     * @param ix The integer @a x coordinate of a nearby value.
-     * @param iy The integer @a y coordinate of a nearby value.
-     * @param iz The integer @a z coordinate of a nearby value.
+     * @param fx   The floating-point @a x coordinate of the input value.
+     * @param fy   The floating-point @a y coordinate of the input value.
+     * @param fz   The floating-point @a z coordinate of the input value.
+     * @param ix   The integer @a x coordinate of a nearby value.
+     * @param iy   The integer @a y coordinate of a nearby value.
+     * @param iz   The integer @a z coordinate of a nearby value.
      * @param seed The random number seed.
      *
      * @return The generated gradient-noise value.
@@ -622,6 +878,94 @@ public class Globals {
      * three-dimensional input value and the integer coordinates of a nearby
      * three-dimensional value.
      *
+     * @param fx   The floating-point @a x coordinate of the input value.
+     * @param fy   The floating-point @a y coordinate of the input value.
+     * @param fz   The floating-point @a z coordinate of the input value.
+     * @param fw   The floating-point @a w coordinate of the input value.
+     * @param fu   The floating-point @a u coordinate of the input value.
+     * @param fv   The floating-point @a v coordinate of the input value.
+     * @param ix   The integer @a x coordinate of a nearby value.
+     * @param iy   The integer @a y coordinate of a nearby value.
+     * @param iz   The integer @a z coordinate of a nearby value.
+     * @param iw   The integer @a w coordinate of a nearby value.
+     * @param iu   The integer @a u coordinate of a nearby value.
+     * @param iv   The integer @a v coordinate of a nearby value.
+     * @param seed The random number seed.
+     *
+     * @return The generated gradient-noise value.
+     *
+     * @noise.pre The difference between @a fx and @a ix must be less than or
+     * equal to one.
+     *
+     * @noise.pre The difference between @a fy and @a iy must be less than or
+     * equal to one.
+     *
+     * @noise.pre The difference between @a fz and @a iz must be less than or
+     * equal to one.
+     *
+     * A <i>gradient</i>-noise function generates better-quality noise than a
+     * <i>value</i>-noise function. Most noise modules use gradient noise for
+     * this reason, although it takes much longer to calculate.
+     *
+     * The return value ranges from -1.0 to +1.0.
+     *
+     * This function generates a gradient-noise value by performing the
+     * following steps: - It first calculates a random normalized vector based
+     * on the nearby integer value passed to this function. - It then calculates
+     * a new value by adding this vector to the nearby integer value passed to
+     * this function. - It then calculates the dot product of the
+     * above-generated value and the floating-point input value passed to this
+     * function.
+     *
+     * A noise function differs from a random-number generator because it always
+     * returns the same output value if the same input value is passed to it.
+     */
+    public static double gradientNoise6D(double fx, double fy, double fz,
+            double fw, double fu, double fv, int ix,
+            int iy, int iz, int iw, int iu, int iv, int seed) {
+        // Randomly generate a gradient vector given the integer coordinates of the
+        // input value.  This implementation generates a random number and uses it
+        // as an index into a normalized-vector lookup table.
+        int vectorIndex
+                = (X_NOISE_GEN * ix
+                + Y_NOISE_GEN * iy
+                + Z_NOISE_GEN * iz
+                + W_NOISE_GEN * iw
+                + U_NOISE_GEN * iu
+                + V_NOISE_GEN * iv
+                + SEED_NOISE_GEN * seed);
+        vectorIndex ^= (vectorIndex >> SHIFT_NOISE_GEN);
+        vectorIndex &= 0xffff;
+        double xvGradient = randomVectors6[(vectorIndex * 6)];
+        double yvGradient = randomVectors6[(vectorIndex * 6) + 1];
+        double zvGradient = randomVectors6[(vectorIndex * 6) + 2];
+        double wvGradient = randomVectors6[(vectorIndex * 6) + 3];
+        double uvGradient = randomVectors6[(vectorIndex * 6) + 4];
+        double vvGradient = randomVectors6[(vectorIndex * 6) + 5];
+        // Set up us another vector equal to the distance between the two vectors
+        // passed to this function.
+        double xvPoint = fx - ix;
+        double yvPoint = fy - iy;
+        double zvPoint = fz - iz;
+        double wvPoint = fw - iw;
+        double uvPoint = fu - iu;
+        double vvPoint = fv - iv;
+        // Now compute the dot product of the gradient vector with the distance
+        // vector.  The resulting value is gradient noise.  Apply a scaling value
+        // so that this noise value ranges from -1.0 to 1.0.
+        return ((xvGradient * xvPoint)
+                + (yvGradient * yvPoint)
+                + (zvGradient * zvPoint)
+                + (wvGradient * wvPoint)
+                + (uvGradient * uvPoint)
+                + (vvGradient * vvPoint)) / SQRT_6_X_6;
+    }
+
+    /**
+     * Generates a gradient-noise value from the coordinates of a
+     * three-dimensional input value and the integer coordinates of a nearby
+     * three-dimensional value.
+     *
      * @param fx The floating-point @a x coordinate of the input value.
      * @param fy The floating-point @a y coordinate of the input value.
      * @param fz The floating-point @a z coordinate of the input value.
@@ -668,15 +1012,16 @@ public class Globals {
      * input value.@param y The integer @a y coordinate of the input
      * value.@param z The integer @a z coordinate of the input value.@param seed
      * A random number seed.@return The generated integer -noise value
-     *
+     * <p>
      * The return value ranges from 0 to 2147483647. A noise function differs
      * from a random -number generator because it always returns the same output
      * value if the same input value is passed to it
      *
-     * @param x integer location x
-     * @param y integer location y
-     * @param z integer location z
+     * @param x    integer location x
+     * @param y    integer location y
+     * @param z    integer location z
      * @param seed seed value
+     *
      * @return noise value at cell
      */
     public static int intValueNoise3D(int x, int y, int z, int seed) {
@@ -691,13 +1036,29 @@ public class Globals {
         return (n * (n * n * 60_493 + 19_990_303) + 1_376_312_589) & 0x7fff_ffff;
     }
 
+    public static int intValueNoise6D(int x, int y, int z, int w, int u, int v,
+            int seed) {
+        // All constants are primes and must remain prime in order for this noise
+        // function to work correctly.
+        int n
+                = (X_NOISE_GEN * x
+                + Y_NOISE_GEN * y
+                + Z_NOISE_GEN * z
+                + W_NOISE_GEN * w
+                + U_NOISE_GEN * u
+                + V_NOISE_GEN * v
+                + SEED_NOISE_GEN * seed) & 0x7fff_ffff;
+        n = (n >> 13) ^ n;
+        return (n * (n * n * 60_493 + 19_990_303) + 1_376_312_589) & 0x7fff_ffff;
+    }
+
     /**
      * Generates an integer -noise value from the coordinates of a three
      * -dimensional input value.@param x The integer @a x coordinate of the
      * input value.@param y The integer @a y coordinate of the input
      * value.@param z The integer @a z coordinate of the input value.@param seed
      * A random number seed.@return The generated integer -noise value
-     *
+     * <p>
      * The return value ranges from 0 to 2147483647. A noise function differs
      * from a random -number generator because it always returns the same output
      * value if the same input value is passed to it
@@ -705,6 +1066,7 @@ public class Globals {
      * @param x integer location x
      * @param y integer location y
      * @param z integer location z
+     *
      * @return noise value at cell
      */
     public static int intValueNoise3D(int x, int y, int z) {
@@ -717,6 +1079,7 @@ public class Globals {
      *
      * @param lat Latitude in degrees
      * @param lon Longitude in degrees
+     *
      * @return Vec3 object that has the coordinates of the longitude/latitude.
      *
      * lat should be in range -90 to 90
@@ -737,7 +1100,8 @@ public class Globals {
      *
      * @param n0 The first value.
      * @param n1 The second value.
-     * @param a The alpha value.
+     * @param a  The alpha value.
+     *
      * @return The interpolated value
      *
      * the alpha value should range from 0.0 to 1.0. If the alpha value is 0.0
@@ -754,8 +1118,8 @@ public class Globals {
      *
      * @param color0 color at 0 alpha
      * @param color1 color at 1 alpha
-     * @param alpha interpolation value
-     * @param out color to set to the value of the interpolation
+     * @param alpha  interpolation value
+     * @param out    color to set to the value of the interpolation
      */
     public static void linearInterpColor(Color color0, Color color1,
             double alpha, Color out) {
@@ -798,6 +1162,7 @@ public class Globals {
      * Maps a value onto a cubic S-curve.
      *
      * @param a The value to map onto a cubic S-curve.
+     *
      * @return The mapped value.
      *
      * Parameter a should range from 0.0 to 1.0
@@ -812,6 +1177,7 @@ public class Globals {
      * Maps a value onto a quintic S-curve
      *
      * @param a The value to map onto a quintic S-curve.
+     *
      * @return The mapped value
      *
      * Parameter a should range from 0.0 to 1.0.
@@ -831,10 +1197,10 @@ public class Globals {
      * Generates a value-coherent-noise value from the coordinates of a
      * three-dimensional input value.
      *
-     * @param x The @a x coordinate of the input value.
-     * @param y The @a y coordinate of the input value.
-     * @param z The @a z coordinate of the input value.
-     * @param seed The random number seed.
+     * @param x            The @a x coordinate of the input value.
+     * @param y            The @a y coordinate of the input value.
+     * @param z            The @a z coordinate of the input value.
+     * @param seed         The random number seed.
      * @param noiseQuality The quality of the coherent-noise.
      *
      * @return The generated value-coherent-noise value.
@@ -845,6 +1211,70 @@ public class Globals {
      * <i>value</i> noise, see the comments for the GradientNoise3D() function.
      */
     public static double valueCoherentNoise3D(double x, double y, double z,
+            int seed, NoiseQuality noiseQuality) {
+        // Create a unit-length cube aligned along an integer boundary.  This cube
+        // surrounds the input point.
+        int x0 = (x > 0.0 ? (int) x : (int) x - 1);
+        int x1 = x0 + 1;
+        int y0 = (y > 0.0 ? (int) y : (int) y - 1);
+        int y1 = y0 + 1;
+        int z0 = (z > 0.0 ? (int) z : (int) z - 1);
+        int z1 = z0 + 1;
+        double xs = 0, ys = 0, zs = 0;
+        switch (noiseQuality) {
+            case FAST:
+                xs = (x - x0);
+                ys = (y - y0);
+                zs = (z - z0);
+                break;
+            case STD:
+                xs = sCurve3(x - x0);
+                ys = sCurve3(y - y0);
+                zs = sCurve3(z - z0);
+                break;
+            case BEST:
+                xs = sCurve5(x - x0);
+                ys = sCurve5(y - y0);
+                zs = sCurve5(z - z0);
+                break;
+        }
+        double n0, n1, ix0, ix1, iy0, iy1;
+        n0 = valueNoise3D(x0, y0, z0, seed);
+        n1 = valueNoise3D(x1, y0, z0, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = valueNoise3D(x0, y1, z0, seed);
+        n1 = valueNoise3D(x1, y1, z0, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy0 = linearInterp(ix0, ix1, ys);
+        n0 = valueNoise3D(x0, y0, z1, seed);
+        n1 = valueNoise3D(x1, y0, z1, seed);
+        ix0 = linearInterp(n0, n1, xs);
+        n0 = valueNoise3D(x0, y1, z1, seed);
+        n1 = valueNoise3D(x1, y1, z1, seed);
+        ix1 = linearInterp(n0, n1, xs);
+        iy1 = linearInterp(ix0, ix1, ys);
+        return linearInterp(iy0, iy1, zs);
+    }
+
+    /**
+     * Generates a value-coherent-noise value from the coordinates of a
+     * three-dimensional input value.
+     *
+     * @param x            The @a x coordinate of the input value.
+     * @param y            The @a y coordinate of the input value.
+     * @param z            The @a z coordinate of the input value.
+     * @param seed         The random number seed.
+     * @param noiseQuality The quality of the coherent-noise.
+     *
+     * @return The generated value-coherent-noise value.
+     *
+     * The return value ranges from -1.0 to +1.0.
+     *
+     * For an explanation of the difference between <i>gradient</i> noise and
+     * <i>value</i> noise, see the comments for the GradientNoise3D() function.
+     */
+    public static double valueCoherentNoise6D(double x, double y, double z,
+            double w, double u, double v,
             int seed, NoiseQuality noiseQuality) {
         // Create a unit-length cube aligned along an integer boundary.  This cube
         // surrounds the input point.
@@ -913,9 +1343,9 @@ public class Globals {
      * Generates a value-noise value from the coordinates of a three-dimensional
      * input value.
      *
-     * @param x The @a x coordinate of the input value.
-     * @param y The @a y coordinate of the input value.
-     * @param z The @a z coordinate of the input value.
+     * @param x    The @a x coordinate of the input value.
+     * @param y    The @a y coordinate of the input value.
+     * @param z    The @a z coordinate of the input value.
      * @param seed A random number seed.
      *
      * @return The generated value-noise value.
@@ -927,6 +1357,11 @@ public class Globals {
      */
     public static double valueNoise3D(int x, int y, int z, int seed) {
         return 1.0 - (intValueNoise3D(x, y, z, seed) / 1073741824.0);
+    }
+
+    public static double valueNoise6D(int x, int y, int z, int w, int u, int v,
+            int seed) {
+        return 1.0 - (intValueNoise6D(x, y, z, w, u, v, seed) / 1073741824.0);
     }
 
     /**
@@ -946,6 +1381,10 @@ public class Globals {
      */
     public static double valueNoise3D(int x, int y, int z) {
         return valueNoise3D(x, y, z, 0);
+    }
+
+    public static double valueNoise6D(int x, int y, int z, int w, int u, int v) {
+        return valueNoise6D(x, y, z, w, u, v, 0);
     }
 
     private static final Logger LOG = Logger.getLogger(Globals.class.getName());

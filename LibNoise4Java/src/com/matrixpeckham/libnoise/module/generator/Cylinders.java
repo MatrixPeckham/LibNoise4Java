@@ -7,10 +7,12 @@
  */
 package com.matrixpeckham.libnoise.module.generator;
 
-import com.matrixpeckham.libnoise.module.AbstractModule;
 import static com.matrixpeckham.libnoise.util.Globals.getMin;
 import static java.lang.Math.floor;
 import static java.lang.Math.sqrt;
+
+import com.matrixpeckham.libnoise.module.AbstractModule;
+import com.matrixpeckham.libnoise.module.NoiseSample;
 import java.util.logging.Logger;
 
 /**
@@ -49,7 +51,7 @@ public class Cylinders extends AbstractModule {
 
     /**
      * frequency
-     *
+     * <p>
      */
     protected double frequency;
 
@@ -78,14 +80,17 @@ public class Cylinders extends AbstractModule {
     }
 
     @Override
-    public double getValue(double x, double y, double z) {
+    public NoiseSample getNoise(double x, double y, double z, double w, double u,
+            double v) {
         x *= frequency;
         z *= frequency;
         double distFromCenter = sqrt(x * x + z * z);
         double distFromSmallSphere = distFromCenter - floor(distFromCenter);
         double distFromLargerSphere = 1.0 - distFromSmallSphere;
         double nearestDist = getMin(distFromSmallSphere, distFromLargerSphere);
-        return 1.0 - (nearestDist * 4.0);//map to -1-1.
+        NoiseSample s = new NoiseSample();
+        s.value = 1.0 - (nearestDist * 4.0);
+        return s;//map to -1-1.
 
     }
 

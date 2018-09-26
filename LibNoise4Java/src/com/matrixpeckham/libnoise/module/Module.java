@@ -48,6 +48,49 @@ public interface Module {
      * value.
      *
      * @param x The @a x coordinate of the input value.
+     *
+     * @return The output value.
+     *
+     * @noise.pre All source modules required by this noise module have been
+     * passed to the SetSourceModule() method.
+     *
+     * Before an application can call this method, it must first connect all
+     * required source modules via the SetSourceModule() method. If these source
+     * modules are not connected to this noise module, this method raises a
+     * debug assertion.
+     *
+     * To determine the number of source modules required by this noise module,
+     * call the GetSourceModuleCount() method.
+     */
+    public double getValue(double x);
+
+    /**
+     * Generates an output value given the coordinates of the specified input
+     * value.
+     *
+     * @param x The @a x coordinate of the input value.
+     * @param y The @a y coordinate of the input value.
+     *
+     * @return The output value.
+     *
+     * @noise.pre All source modules required by this noise module have been
+     * passed to the SetSourceModule() method.
+     *
+     * Before an application can call this method, it must first connect all
+     * required source modules via the SetSourceModule() method. If these source
+     * modules are not connected to this noise module, this method raises a
+     * debug assertion.
+     *
+     * To determine the number of source modules required by this noise module,
+     * call the GetSourceModuleCount() method.
+     */
+    public double getValue(double x, double y);
+
+    /**
+     * Generates an output value given the coordinates of the specified input
+     * value.
+     *
+     * @param x The @a x coordinate of the input value.
      * @param y The @a y coordinate of the input value.
      * @param z The @a z coordinate of the input value.
      *
@@ -65,6 +108,61 @@ public interface Module {
      * call the GetSourceModuleCount() method.
      */
     public double getValue(double x, double y, double z);
+
+    /**
+     * Generates an output value given the coordinates of the specified input
+     * value.
+     *
+     * @param x The @a x coordinate of the input value.
+     * @param y The @a y coordinate of the input value.
+     * @param z The @a z coordinate of the input value.
+     * @param w The @a w coordinate of the input value.
+     *
+     * @return The output value.
+     *
+     * @noise.pre All source modules required by this noise module have been
+     * passed to the SetSourceModule() method.
+     *
+     * Before an application can call this method, it must first connect all
+     * required source modules via the SetSourceModule() method. If these source
+     * modules are not connected to this noise module, this method raises a
+     * debug assertion.
+     *
+     * To determine the number of source modules required by this noise module,
+     * call the GetSourceModuleCount() method.
+     */
+    public double getValue(double x, double y, double z, double w);
+
+    /**
+     * Generates an output value given the coordinates of the specified input
+     * value.
+     *
+     * @param x The @a x coordinate of the input value.
+     * @param y The @a y coordinate of the input value.
+     * @param z The @a z coordinate of the input value.
+     * @param w The @a w coordinate of the input value.
+     * @param u The @a u coordinate of the input value.
+     * @param v The @a v coordinate of the input value.
+     *
+     * @return The output value.
+     *
+     * @noise.pre All source modules required by this noise module have been
+     * passed to the SetSourceModule() method.
+     *
+     * Before an application can call this method, it must first connect all
+     * required source modules via the SetSourceModule() method. If these source
+     * modules are not connected to this noise module, this method raises a
+     * debug assertion.
+     *
+     * To determine the number of source modules required by this noise module,
+     * call the GetSourceModuleCount() method.
+     */
+    public double getValue(double x, double y, double z, double w, double u,
+            double v
+    );
+
+    public NoiseSample getNoise(double x, double y, double z, double w, double u,
+            double v);
 
     public void setSourceModule(int index, Module source);
 
